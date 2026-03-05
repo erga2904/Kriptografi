@@ -168,8 +168,16 @@ async function fcProcess() {
         const resp = await fetch(endpoint, {method: 'POST', body: formData});
 
         if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.error || 'Gagal memproses');
+            let errorMsg = 'Gagal memproses';
+            const ct = resp.headers.get('Content-Type') || '';
+            if (ct.includes('application/json')) {
+                const err = await resp.json();
+                errorMsg = err.error || errorMsg;
+            } else {
+                const txt = await resp.text();
+                errorMsg = txt || `HTTP ${resp.status}`;
+            }
+            throw new Error(errorMsg);
         }
 
         const blob = await resp.blob();
