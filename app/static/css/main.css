@@ -538,9 +538,56 @@ select.input-field {
     border-radius: var(--radius-md);
     padding: 1rem;
     overflow-x: auto;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-all;
     color: #CBD5E1;
-    white-space: pre;
+    white-space: pre-wrap;
     tab-size: 4;
+}
+
+/* Specific handling for long numbers and hashes */
+.break-all {
+    word-break: break-all !important;
+    overflow-wrap: break-word !important;
+}
+
+.break-word {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Number output styling */
+.number-output {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    display: block;
+}
+
+/* Scrollable container for very long content */
+.scrollable-x {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+}
+
+/* Hash and crypto output container */
+.crypto-output {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background: rgba(11, 17, 32, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.08);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    word-break: break-all;
+    color: #CBD5E1;
+    max-width: 100%;
+    display: block;
 }
 
 /* ═══════════════ PROGRESS BAR ═══════════════ */
