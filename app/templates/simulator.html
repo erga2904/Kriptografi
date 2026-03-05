@@ -150,17 +150,17 @@ async function simGenerate() {
                 const div = document.createElement('div');
                 div.className = 'p-4 rounded-lg bg-surface-700/50 border border-border-subtle animate-slide-up';
                 let detail = '';
-                if (s.formula) detail = `<div class="font-mono text-accent-light text-sm mt-1">${s.formula}</div>`;
-                if (s.verify) detail += `<div class="text-xs text-gray-500 mt-1">Verifikasi: ${s.verify}</div>`;
+                if (s.formula) detail = `<div class="font-mono text-accent-light text-sm mt-1 break-all overflow-wrap-anywhere">${s.formula}</div>`;
+                if (s.verify) detail += `<div class="text-xs text-gray-500 mt-1 break-all">${s.verify}</div>`;
                 if (s.p_is_prime !== undefined) {
-                    detail = `<div class="text-xs mt-1">p=${s.p} <span class="${s.p_is_prime?'text-green-400':'text-red-400'}">(${s.p_is_prime?'prima':'bukan prima'})</span>, q=${s.q} <span class="${s.q_is_prime?'text-green-400':'text-red-400'}">(${s.q_is_prime?'prima':'bukan prima'})</span></div>`;
+                    detail = `<div class="text-xs mt-1 break-all">p=${s.p} <span class="${s.p_is_prime?'text-green-400':'text-red-400'}">(${s.p_is_prime?'prima':'bukan prima'})</span>, q=${s.q} <span class="${s.q_is_prime?'text-green-400':'text-red-400'}">(${s.q_is_prime?'prima':'bukan prima'})</span></div>`;
                 }
                 div.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-mono text-accent-light bg-accent/10 px-2 py-0.5 rounded">Langkah ${i+1}</span>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs font-mono text-accent-light bg-accent/10 px-2 py-0.5 rounded flex-shrink-0">Langkah ${i+1}</span>
                         <span class="text-sm text-white font-medium">${s.step}</span>
                     </div>
-                    ${detail}
+                    <div class="break-all overflow-x-auto">${detail}</div>
                 `;
                 stepsEl.appendChild(div);
             }, i * 300);
