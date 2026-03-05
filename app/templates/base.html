@@ -233,22 +233,23 @@
     <!-- Sidebar Overlay (Mobile) -->
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden invisible opacity-0 transition-opacity duration-300"></div>
 
-    <!-- Sidebar Toggle (Mobile) -->
-    <button id="sidebar-toggle" class="fixed top-4 left-4 z-[60] lg:hidden bg-surface-700 p-2.5 rounded-lg border border-border-subtle hover:bg-surface-600 transition-colors">
-        <svg class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-    </button>
-
     <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
     <main id="main-content" class="lg:ml-64 min-h-screen transition-all duration-300">
         <!-- Top Bar -->
         <header class="sticky top-0 z-40 bg-surface-900/60 backdrop-blur-xl border-b border-border-subtle">
-            <div class="pl-16 pr-4 sm:px-6 lg:pl-8 lg:pr-8 py-3 sm:py-4 flex items-center justify-between gap-3 sm:gap-4">
+            <div class="px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
+                <!-- Mobile Menu Button (integrated in header) -->
+                <button id="sidebar-toggle" class="lg:hidden flex-shrink-0 p-2 -ml-2 rounded-lg hover:bg-surface-700/50 transition-colors">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                
                 <div class="min-w-0 flex-1">
                     <h1 class="text-base sm:text-lg font-semibold text-white truncate">{% block page_title %}Dasbor{% endblock %}</h1>
                     <p class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{% block page_subtitle %}Platform Pembelajaran Kriptografi{% endblock %}</p>
                 </div>
+                
                 <div class="flex items-center gap-2 flex-shrink-0">
                     <div class="text-xs text-gray-500 font-mono bg-surface-700 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md border border-border-subtle whitespace-nowrap">
                         v2.0.0
