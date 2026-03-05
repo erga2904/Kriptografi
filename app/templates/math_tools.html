@@ -1,288 +1,288 @@
 {% extends "base.html" %}
 
-{% block title %}Sandi Klasik — CipherLab{% endblock %}
-{% block page_title %}Sandi Klasik{% endblock %}
-{% block page_subtitle %}Enkripsi dan dekripsi dengan algoritma historis{% endblock %}
+{% block title %}Dasar Matematika — CipherLab{% endblock %}
+{% block page_title %}Dasar Matematika{% endblock %}
+{% block page_subtitle %}Alat matematika inti untuk kriptografi{% endblock %}
 
 {% block content %}
-<!-- Cipher Selector Tabs -->
+<!-- Tabs -->
 <div class="flex gap-2 mb-6 overflow-x-auto pb-2 flex-wrap">
-    <button onclick="selectCipher('caesar')" id="tab-caesar" class="cipher-tab active">Caesar</button>
-    <button onclick="selectCipher('vigenere')" id="tab-vigenere" class="cipher-tab">Vigenère</button>
-    <button onclick="selectCipher('affine')" id="tab-affine" class="cipher-tab">Affine</button>
-    <button onclick="selectCipher('hill')" id="tab-hill" class="cipher-tab">Hill</button>
-    <button onclick="selectCipher('playfair')" id="tab-playfair" class="cipher-tab">Playfair</button>
+    <button onclick="selectMath('modular')" id="tab-modular" class="cipher-tab active">Aritmetika Modular</button>
+    <button onclick="selectMath('euclidean')" id="tab-euclidean" class="cipher-tab">Euclidean</button>
+    <button onclick="selectMath('ext-euclidean')" id="tab-ext-euclidean" class="cipher-tab">Euclidean Diperluas</button>
+    <button onclick="selectMath('mod-inverse')" id="tab-mod-inverse" class="cipher-tab">Invers Modular</button>
+    <button onclick="selectMath('fast-exp')" id="tab-fast-exp" class="cipher-tab">Eksponensial Cepat</button>
 </div>
 
-<!-- ═══════════════ CAESAR ═══════════════ -->
-<div id="panel-caesar" class="cipher-panel">
+<!-- ═══════════════ MODULAR ARITHMETIC ═══════════════ -->
+<div id="panel-modular" class="math-panel">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card-base p-6">
-            <h3 class="text-white font-semibold mb-1">Sandi Caesar</h3>
-            <p class="text-sm text-gray-500 mb-5">Geser setiap huruf sebanyak posisi tetap. E(x) = (x + k) mod 26</p>
+            <h3 class="text-white font-semibold mb-1">Aritmetika Modular</h3>
+            <p class="text-sm text-gray-500 mb-5">Visualisasikan operasi modular: tambah, kurang, kali, pangkat.</p>
             <div class="space-y-4">
-                <div>
-                    <label class="label">Teks Biasa / Teks Sandi</label>
-                    <textarea id="caesar-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
+                <div class="grid grid-cols-3 gap-3">
+                    <div><label class="label">a</label><input type="number" id="mod-a" class="input-field" value="17"></div>
+                    <div>
+                        <label class="label">Operasi</label>
+                        <select id="mod-op" class="input-field">
+                            <option value="add">+ (tambah)</option>
+                            <option value="subtract">− (kurang)</option>
+                            <option value="multiply">× (kali)</option>
+                            <option value="power">^ (pangkat)</option>
+                        </select>
+                    </div>
+                    <div><label class="label">b</label><input type="number" id="mod-b" class="input-field" value="5"></div>
                 </div>
                 <div>
-                    <label class="label">Pergeseran (k)</label>
-                    <input type="number" id="caesar-shift" class="input-field" value="3" min="0" max="25">
+                    <label class="label">mod</label>
+                    <input type="number" id="mod-m" class="input-field" value="26">
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="runCipher('caesar','encrypt')" class="btn-primary flex-1">Enkripsi</button>
-                    <button onclick="runCipher('caesar','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
-                </div>
+                <button onclick="runMath('modular')" class="btn-primary w-full">Hitung</button>
             </div>
         </div>
-        <div id="result-caesar" class="card-base p-6 hidden">
+        <div id="result-modular" class="card-base p-6 hidden">
             <h3 class="text-white font-semibold mb-4">Hasil</h3>
-            <div id="result-caesar-content"></div>
+            <div id="result-modular-content"></div>
         </div>
     </div>
 </div>
 
-<!-- ═══════════════ VIGENERE ═══════════════ -->
-<div id="panel-vigenere" class="cipher-panel hidden">
+<!-- ═══════════════ EUCLIDEAN ═══════════════ -->
+<div id="panel-euclidean" class="math-panel hidden">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card-base p-6">
-            <h3 class="text-white font-semibold mb-1">Sandi Vigenère</h3>
-            <p class="text-sm text-gray-500 mb-5">Substitusi polialfabetik menggunakan kata kunci. E(pᵢ) = (pᵢ + kᵢ) mod 26</p>
+            <h3 class="text-white font-semibold mb-1">Algoritma Euclidean</h3>
+            <p class="text-sm text-gray-500 mb-5">Hitung FPB dengan pembagian langkah demi langkah.</p>
             <div class="space-y-4">
-                <div>
-                    <label class="label">Teks Biasa / Teks Sandi</label>
-                    <textarea id="vigenere-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
-                </div>
-                <div>
-                    <label class="label">Kunci (huruf saja)</label>
-                    <input type="text" id="vigenere-key" class="input-field" placeholder="RAHASIA">
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="runCipher('vigenere','encrypt')" class="btn-primary flex-1">Enkripsi</button>
-                    <button onclick="runCipher('vigenere','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
-                </div>
-            </div>
-        </div>
-        <div id="result-vigenere" class="card-base p-6 hidden">
-            <h3 class="text-white font-semibold mb-4">Hasil</h3>
-            <div id="result-vigenere-content"></div>
-        </div>
-    </div>
-</div>
-
-<!-- ═══════════════ AFFINE ═══════════════ -->
-<div id="panel-affine" class="cipher-panel hidden">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="card-base p-6">
-            <h3 class="text-white font-semibold mb-1">Sandi Affine</h3>
-            <p class="text-sm text-gray-500 mb-5">E(x) = (ax + b) mod 26 di mana gcd(a, 26) = 1</p>
-            <div class="space-y-4">
-                <div>
-                    <label class="label">Teks Biasa / Teks Sandi</label>
-                    <textarea id="affine-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
-                </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="label">a (koprima dengan 26)</label>
-                        <input type="number" id="affine-a" class="input-field" value="5">
-                    </div>
-                    <div>
-                        <label class="label">b</label>
-                        <input type="number" id="affine-b" class="input-field" value="8">
-                    </div>
+                    <div><label class="label">a</label><input type="number" id="euc-a" class="input-field" value="252"></div>
+                    <div><label class="label">b</label><input type="number" id="euc-b" class="input-field" value="198"></div>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="runCipher('affine','encrypt')" class="btn-primary flex-1">Enkripsi</button>
-                    <button onclick="runCipher('affine','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
-                </div>
+                <button onclick="runMath('euclidean')" class="btn-primary w-full">Hitung FPB</button>
             </div>
         </div>
-        <div id="result-affine" class="card-base p-6 hidden">
+        <div id="result-euclidean" class="card-base p-6 hidden">
             <h3 class="text-white font-semibold mb-4">Hasil</h3>
-            <div id="result-affine-content"></div>
+            <div id="result-euclidean-content"></div>
         </div>
     </div>
 </div>
 
-<!-- ═══════════════ HILL ═══════════════ -->
-<div id="panel-hill" class="cipher-panel hidden">
+<!-- ═══════════════ EXTENDED EUCLIDEAN ═══════════════ -->
+<div id="panel-ext-euclidean" class="math-panel hidden">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card-base p-6">
-            <h3 class="text-white font-semibold mb-1">Sandi Hill</h3>
-            <p class="text-sm text-gray-500 mb-5">Perkalian matriks modulo 26. C = K · P mod 26</p>
+            <h3 class="text-white font-semibold mb-1">Algoritma Euclidean Diperluas</h3>
+            <p class="text-sm text-gray-500 mb-5">Cari x, y sehingga ax + by = fpb(a, b).</p>
             <div class="space-y-4">
-                <div>
-                    <label class="label">Teks Biasa / Teks Sandi</label>
-                    <textarea id="hill-text" class="input-field h-24" placeholder="Masukkan pesan (huruf saja)..."></textarea>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="label">a</label><input type="number" id="ext-a" class="input-field" value="35"></div>
+                    <div><label class="label">b</label><input type="number" id="ext-b" class="input-field" value="15"></div>
                 </div>
-                <div>
-                    <label class="label">Matriks Kunci (2×2, pisahkan dengan koma)</label>
-                    <input type="text" id="hill-key" class="input-field font-mono" placeholder="6,24,1;13,16,10;20,17,15" value="3,3;2,5">
-                    <p class="text-xs text-gray-500 mt-1">Format: baris1_a,baris1_b;baris2_a,baris2_b (misal 3,3;2,5 untuk 2×2)</p>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="runCipher('hill','encrypt')" class="btn-primary flex-1">Enkripsi</button>
-                    <button onclick="runCipher('hill','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
-                </div>
+                <button onclick="runMath('ext-euclidean')" class="btn-primary w-full">Hitung</button>
             </div>
         </div>
-        <div id="result-hill" class="card-base p-6 hidden">
-            <h3 class="text-white font-semibold mb-4">Hasil</h3>
-            <div id="result-hill-content"></div>
+        <div id="result-ext-euclidean" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Result</h3>
+            <div id="result-ext-euclidean-content"></div>
         </div>
     </div>
 </div>
 
-<!-- ═══════════════ PLAYFAIR ═══════════════ -->
-<div id="panel-playfair" class="cipher-panel hidden">
+<!-- ═══════════════ MODULAR INVERSE ═══════════════ -->
+<div id="panel-mod-inverse" class="math-panel hidden">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card-base p-6">
-            <h3 class="text-white font-semibold mb-1">Sandi Playfair</h3>
-            <p class="text-sm text-gray-500 mb-5">Substitusi digraf menggunakan kotak Polybius 5×5.</p>
+            <h3 class="text-white font-semibold mb-1">Modular Inverse</h3>
+            <p class="text-sm text-gray-500 mb-5">Find a⁻¹ mod m such that a · a⁻¹ ≡ 1 (mod m).</p>
             <div class="space-y-4">
-                <div>
-                    <label class="label">Teks Biasa / Teks Sandi</label>
-                    <textarea id="playfair-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="label">a</label><input type="number" id="inv-a" class="input-field" value="7"></div>
+                    <div><label class="label">m</label><input type="number" id="inv-m" class="input-field" value="26"></div>
                 </div>
-                <div>
-                    <label class="label">Kunci</label>
-                    <input type="text" id="playfair-key" class="input-field" placeholder="MONARCHY">
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="runCipher('playfair','encrypt')" class="btn-primary flex-1">Enkripsi</button>
-                    <button onclick="runCipher('playfair','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
-                </div>
+                <button onclick="runMath('mod-inverse')" class="btn-primary w-full">Find Inverse</button>
             </div>
         </div>
-        <div id="result-playfair" class="card-base p-6 hidden">
-            <h3 class="text-white font-semibold mb-4">Hasil</h3>
-            <div id="result-playfair-content"></div>
+        <div id="result-mod-inverse" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Result</h3>
+            <div id="result-mod-inverse-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ FAST EXPONENTIATION ═══════════════ -->
+<div id="panel-fast-exp" class="math-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Fast Exponentiation</h3>
+            <p class="text-sm text-gray-500 mb-5">Square-and-multiply method for computing base^exp mod m efficiently.</p>
+            <div class="space-y-4">
+                <div class="grid grid-cols-3 gap-3">
+                    <div><label class="label">Base</label><input type="number" id="fexp-base" class="input-field" value="7"></div>
+                    <div><label class="label">Exponent</label><input type="number" id="fexp-exp" class="input-field" value="560"></div>
+                    <div><label class="label">Mod</label><input type="number" id="fexp-mod" class="input-field" value="561"></div>
+                </div>
+                <button onclick="runMath('fast-exp')" class="btn-primary w-full">Compute</button>
+            </div>
+        </div>
+        <div id="result-fast-exp" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Result</h3>
+            <div id="result-fast-exp-content"></div>
         </div>
     </div>
 </div>
 
 <script>
-const CIPHERS = ['caesar','vigenere','affine','hill','playfair'];
+const MATH_PANELS = ['modular','euclidean','ext-euclidean','mod-inverse','fast-exp'];
 
-function selectCipher(name) {
-    CIPHERS.forEach(c => {
-        document.getElementById('panel-' + c).classList.toggle('hidden', c !== name);
-        document.getElementById('tab-' + c).classList.toggle('active', c === name);
+function selectMath(name) {
+    MATH_PANELS.forEach(m => {
+        document.getElementById('panel-' + m).classList.toggle('hidden', m !== name);
+        document.getElementById('tab-' + m).classList.toggle('active', m === name);
     });
 }
 
-function parseHillKey(str) {
-    return str.split(';').map(row => row.split(',').map(Number));
-}
+async function runMath(panel) {
+    const btn = event.target; btn.classList.add('loading'); btn.disabled = true;
+    let url, body;
 
-async function runCipher(cipher, mode) {
-    const btn = event.target;
-    btn.classList.add('loading');
-    btn.disabled = true;
-
-    let body = { mode };
-    switch(cipher) {
-        case 'caesar':
-            body.text = document.getElementById('caesar-text').value;
-            body.shift = parseInt(document.getElementById('caesar-shift').value);
+    switch(panel) {
+        case 'modular':
+            url = '/api/math/modular';
+            body = {
+                a: parseInt(document.getElementById('mod-a').value),
+                b: parseInt(document.getElementById('mod-b').value),
+                mod: parseInt(document.getElementById('mod-m').value),
+                operation: document.getElementById('mod-op').value
+            };
             break;
-        case 'vigenere':
-            body.text = document.getElementById('vigenere-text').value;
-            body.key = document.getElementById('vigenere-key').value;
+        case 'euclidean':
+            url = '/api/math/euclidean';
+            body = {
+                a: parseInt(document.getElementById('euc-a').value),
+                b: parseInt(document.getElementById('euc-b').value)
+            };
             break;
-        case 'affine':
-            body.text = document.getElementById('affine-text').value;
-            body.a = parseInt(document.getElementById('affine-a').value);
-            body.b = parseInt(document.getElementById('affine-b').value);
+        case 'ext-euclidean':
+            url = '/api/math/extended-euclidean';
+            body = {
+                a: parseInt(document.getElementById('ext-a').value),
+                b: parseInt(document.getElementById('ext-b').value)
+            };
             break;
-        case 'hill':
-            body.text = document.getElementById('hill-text').value;
-            body.key_matrix = parseHillKey(document.getElementById('hill-key').value);
+        case 'mod-inverse':
+            url = '/api/math/mod-inverse';
+            body = {
+                a: parseInt(document.getElementById('inv-a').value),
+                m: parseInt(document.getElementById('inv-m').value)
+            };
             break;
-        case 'playfair':
-            body.text = document.getElementById('playfair-text').value;
-            body.key = document.getElementById('playfair-key').value;
+        case 'fast-exp':
+            url = '/api/math/fast-exp';
+            body = {
+                base: parseInt(document.getElementById('fexp-base').value),
+                exp: parseInt(document.getElementById('fexp-exp').value),
+                mod: parseInt(document.getElementById('fexp-mod').value)
+            };
             break;
     }
 
     try {
-        const res = await fetch('/api/classical/' + cipher, {
+        const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
         const data = await res.json();
-        if (data.error) {
-            showError('result-' + cipher + '-content', data.error);
-        } else {
-            renderClassicalResult(cipher, data);
-        }
-        document.getElementById('result-' + cipher).classList.remove('hidden');
-        document.getElementById('result-' + cipher).classList.add('animate-slide-up');
+        renderMathResult(panel, data);
+        document.getElementById('result-' + panel).classList.remove('hidden');
+        document.getElementById('result-' + panel).classList.add('animate-slide-up');
     } catch(e) {
-        showError('result-' + cipher + '-content', 'Request failed: ' + e.message);
-        document.getElementById('result-' + cipher).classList.remove('hidden');
+        document.getElementById('result-' + panel + '-content').innerHTML =
+            `<div class="text-red-400 text-sm">${e.message}</div>`;
+        document.getElementById('result-' + panel).classList.remove('hidden');
     } finally {
-        btn.classList.remove('loading');
-        btn.disabled = false;
+        btn.classList.remove('loading'); btn.disabled = false;
     }
 }
 
-function showError(id, msg) {
-    document.getElementById(id).innerHTML = `<div class="text-red-400 text-sm">${msg}</div>`;
-}
+function renderMathResult(panel, data) {
+    const el = document.getElementById('result-' + panel + '-content');
+    if (data.error) { el.innerHTML = `<div class="text-red-400 text-sm">${data.error}</div>`; return; }
 
-function renderClassicalResult(cipher, data) {
-    const container = document.getElementById('result-' + cipher + '-content');
     let html = '';
 
-    // Output
-    html += `<div class="mb-4">
-        <span class="label">Keluaran</span>
-        <div class="font-mono text-accent-light bg-surface-900 p-3 rounded-lg border border-border-subtle text-sm break-all select-all">${escapeHtml(data.output)}</div>
-    </div>`;
-
-    // Math formula
-    if (data.math) {
-        html += `<div class="mb-4">
-            <span class="label">Rumus</span>
-            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-3 rounded-lg border border-border-subtle break-all">${escapeHtml(data.math)}</div>
+    // Main result
+    if (data.result !== undefined) {
+        html += `<div class="mb-4"><span class="label">Result</span>
+            <div class="text-2xl font-bold text-accent-light font-mono">${data.result}</div></div>`;
+    }
+    if (data.gcd !== undefined) {
+        html += `<div class="mb-4"><span class="label">GCD</span>
+            <div class="text-2xl font-bold text-accent-light font-mono">${data.gcd}</div></div>`;
+    }
+    if (data.inverse !== undefined) {
+        html += `<div class="mb-4"><span class="label">Inverse</span>
+            <div class="text-2xl font-bold text-accent-light font-mono">${data.inverse}</div></div>`;
+    }
+    if (data.exists === false) {
+        html += `<div class="text-red-400 text-sm mb-4">${data.reason}</div>`;
+    }
+    if (data.x !== undefined && data.y !== undefined) {
+        html += `<div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
+                <div class="text-xs text-gray-500">x</div><div class="font-mono text-white">${data.x}</div>
+            </div>
+            <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
+                <div class="text-xs text-gray-500">y</div><div class="font-mono text-white">${data.y}</div>
+            </div>
         </div>`;
     }
 
-    // Playfair matrix
-    if (cipher === 'playfair' && data.matrix) {
-        html += `<div class="mb-4"><span class="label">Matriks 5×5</span><div class="grid grid-cols-5 gap-1 max-w-[200px]">`;
-        data.matrix.forEach(row => {
-            row.forEach(ch => {
-                html += `<div class="w-9 h-9 flex items-center justify-center bg-surface-900 border border-border-subtle rounded text-sm font-mono text-accent-light">${ch}</div>`;
-            });
-        });
-        html += `</div></div>`;
+    // Math formula
+    if (data.math) {
+        html += `<div class="mb-4"><span class="label">Formula</span>
+            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-3 rounded-lg border border-border-subtle break-all">${escapeHtml(data.math)}</div></div>`;
     }
 
-    // Steps (collapsible)
+    // Verification
+    if (data.verification) {
+        html += `<div class="mb-4"><span class="label">Verification</span>
+            <div class="font-mono text-xs text-green-400 bg-surface-900 p-2 rounded border border-border-subtle">${escapeHtml(data.verification)}</div></div>`;
+    }
+
+    // Binary representation for fast exp
+    if (data.binary_exponent) {
+        html += `<div class="mb-4"><span class="label">Binary Exponent</span>
+            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-2 rounded border border-border-subtle tracking-wider break-all">${data.binary_exponent.split('').map((b,i) => `<span class="${b==='1' ? 'text-accent-light' : 'text-gray-500'}">${b}</span>`).join('')}</div></div>`;
+    }
+
+    // Steps
     if (data.steps && data.steps.length > 0) {
-        html += `<details class="mt-4">
-            <summary class="cursor-pointer text-sm text-gray-400 hover:text-gray-200 transition-colors select-none">
-                Tampilkan ${data.steps.length} langkah
-            </summary>
-            <div class="mt-3 space-y-2 max-h-64 overflow-y-auto pr-2">`;
-        data.steps.forEach((step, i) => {
-            html += `<div class="flex items-start gap-3 text-xs font-mono bg-surface-900 p-2.5 rounded border border-border-subtle">
-                <span class="text-gray-500 flex-shrink-0 w-6">${i}</span>
-                <span class="text-gray-300">${escapeHtml(step.formula || step.rule || JSON.stringify(step))}</span>
-                <span class="text-accent-light ml-auto flex-shrink-0">${escapeHtml(step.result || '')}</span>
-            </div>`;
+        html += `<details class="mt-3"><summary class="cursor-pointer text-sm text-gray-400 hover:text-gray-200 transition-colors select-none">Show ${data.steps.length} step(s)</summary>
+            <div class="mt-3 overflow-x-auto">
+            <table class="w-full text-xs font-mono"><thead><tr class="text-gray-500 border-b border-border-subtle">`;
+
+        // Determine columns from first step
+        const keys = Object.keys(data.steps[0]);
+        keys.forEach(k => { html += `<th class="text-left p-2">${k}</th>`; });
+        html += `</tr></thead><tbody>`;
+        data.steps.forEach(step => {
+            html += `<tr class="border-b border-border-subtle hover:bg-surface-700/30">`;
+            keys.forEach(k => {
+                const v = step[k];
+                html += `<td class="p-2 text-gray-300">${typeof v === 'object' ? JSON.stringify(v) : escapeHtml(String(v))}</td>`;
+            });
+            html += `</tr>`;
         });
-        html += `</div></details>`;
+        html += `</tbody></table></div></details>`;
     }
 
-    container.innerHTML = html;
+    el.innerHTML = html;
 }
 
 function escapeHtml(str) {
-    if (typeof str !== 'string') str = String(str);
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
