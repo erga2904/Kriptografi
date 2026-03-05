@@ -263,11 +263,11 @@ async function runRSAWeak() {
                     <div class="text-xs text-gray-500">φ(n)</div><div class="font-mono text-white">${data.phi_n}</div>
                 </div>
                 <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
-                    <div class="text-xs text-gray-500">d (private key)</div><div class="font-mono text-red-400">${data.private_key_d}</div>
+                    <div class="text-xs text-gray-500">d (private key)</div><div class="font-mono text-red-400 break-all">${data.private_key_d}</div>
                 </div>
             </div>`;
             if (data.math) {
-                html += `<div class="font-mono text-xs text-gray-300 bg-surface-900 p-3 rounded border border-border-subtle">${escapeHtml(data.math)}</div>`;
+                html += `<div class="font-mono text-xs text-gray-300 bg-surface-900 p-3 rounded border border-border-subtle break-all">${escapeHtml(data.math)}</div>`;
             }
         } else {
             html += `<div class="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
