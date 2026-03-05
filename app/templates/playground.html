@@ -38,16 +38,18 @@
         <!-- Algorithm Select -->
         <div>
             <label class="label">Algoritma</label>
-            <select id="pg-algorithm" class="input-field" onchange="pgUpdateParams()">
-                <option value="caesar">Caesar Cipher</option>
-                <option value="vigenere">Vigenère Cipher</option>
-                <option value="affine">Affine Cipher</option>
-                <option value="playfair">Playfair Cipher</option>
-                <option value="hill">Hill Cipher</option>
-                <option value="aes">AES-128</option>
-                <option value="rsa">RSA</option>
-                <option value="sha256">SHA-256</option>
-            </select>
+            <div class="custom-select-wrapper">
+                <select id="pg-algorithm" class="custom-select select-accent" onchange="pgUpdateParams()">
+                    <option value="caesar">Caesar Cipher</option>
+                    <option value="vigenere">Vigenère Cipher</option>
+                    <option value="affine">Affine Cipher</option>
+                    <option value="playfair">Playfair Cipher</option>
+                    <option value="hill">Hill Cipher</option>
+                    <option value="aes">AES-128</option>
+                    <option value="rsa">RSA</option>
+                    <option value="sha256">SHA-256</option>
+                </select>
+            </div>
         </div>
 
         <!-- Mode -->
