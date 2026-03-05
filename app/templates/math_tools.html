@@ -243,7 +243,7 @@ function renderMathResult(panel, data) {
     // Math formula
     if (data.math) {
         html += `<div class="mb-4"><span class="label">Formula</span>
-            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-3 rounded-lg border border-border-subtle">${escapeHtml(data.math)}</div></div>`;
+            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-3 rounded-lg border border-border-subtle break-all">${escapeHtml(data.math)}</div></div>`;
     }
 
     // Verification
@@ -255,7 +255,7 @@ function renderMathResult(panel, data) {
     // Binary representation for fast exp
     if (data.binary_exponent) {
         html += `<div class="mb-4"><span class="label">Binary Exponent</span>
-            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-2 rounded border border-border-subtle tracking-wider">${data.binary_exponent.split('').map((b,i) => `<span class="${b==='1' ? 'text-accent-light' : 'text-gray-500'}">${b}</span>`).join('')}</div></div>`;
+            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-2 rounded border border-border-subtle tracking-wider break-all">${data.binary_exponent.split('').map((b,i) => `<span class="${b==='1' ? 'text-accent-light' : 'text-gray-500'}">${b}</span>`).join('')}</div></div>`;
     }
 
     // Steps
