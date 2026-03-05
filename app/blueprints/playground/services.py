@@ -81,55 +81,69 @@ def run_playground(algorithm: str, mode: str, text: str, params: dict) -> dict:
         if algorithm == "caesar":
             shift = int(params.get("shift", 3))
             fn = caesar_encrypt if mode == "encrypt" else caesar_decrypt
-            output = fn(text, shift)
-            result["output"] = output
+            data = fn(text, shift)
+            result["result"] = data.get("output", data) if isinstance(data, dict) else data
+            result["steps"] = data.get("steps", []) if isinstance(data, dict) else []
 
         elif algorithm == "vigenere":
             key = params.get("key", "SECRET")
             fn = vigenere_encrypt if mode == "encrypt" else vigenere_decrypt
-            output = fn(text, key)
-            result["output"] = output
+            data = fn(text, key)
+            result["result"] = data.get("output", data) if isinstance(data, dict) else data
+            result["steps"] = data.get("steps", []) if isinstance(data, dict) else []
 
         elif algorithm == "affine":
             a = int(params.get("a", 5))
             b = int(params.get("b", 8))
             fn = affine_encrypt if mode == "encrypt" else affine_decrypt
-            output = fn(text, a, b)
-            result["output"] = output
+            data = fn(text, a, b)
+            result["result"] = data.get("output", data) if isinstance(data, dict) else data
+            result["steps"] = data.get("steps", []) if isinstance(data, dict) else []
 
         elif algorithm == "hill":
             key_matrix = params.get("key_matrix", [[6, 24, 1], [13, 16, 10], [20, 17, 15]])
             fn = hill_encrypt if mode == "encrypt" else hill_decrypt
-            output = fn(text, key_matrix)
-            result["output"] = output
+            data = fn(text, key_matrix)
+            result["result"] = data.get("output", data) if isinstance(data, dict) else data
+            result["steps"] = data.get("steps", []) if isinstance(data, dict) else []
 
         elif algorithm == "playfair":
             key = params.get("key", "MONARCHY")
             fn = playfair_encrypt if mode == "encrypt" else playfair_decrypt
-            output = fn(text, key)
-            result["output"] = output
+            data = fn(text, key)
+            result["result"] = data.get("output", data) if isinstance(data, dict) else data
+            result["steps"] = data.get("steps", []) if isinstance(data, dict) else []
 
         elif algorithm == "aes":
             key = params.get("key", "MySecretKey12345")
-            output = aes_encrypt_demo(text, key)
-            result["output"] = output
+            data = aes_encrypt_demo(text, key)
+            result["result"] = data.get("output", data) if isinstance(data, dict) else data
+            result["steps"] = data.get("steps", []) if isinstance(data, dict) else []
 
         elif algorithm == "rsa":
             if mode == "keygen":
                 bits = int(params.get("bits", 32))
-                result = rsa_generate_keys(bits)
+                data = rsa_generate_keys(bits)
+                result["result"] = str(data)
+                result["steps"] = []
             elif mode == "encrypt":
                 e = int(params.get("e", 65537))
                 n = int(params.get("n", 0))
-                result = rsa_encrypt(text, e, n)
+                data = rsa_encrypt(text, e, n)
+                result["result"] = data.get("output_str", data) if isinstance(data, dict) else str(data)
+                result["steps"] = []
             elif mode == "decrypt":
                 d = int(params.get("d", 0))
                 n = int(params.get("n", 0))
                 ciphertext = params.get("ciphertext", [])
-                result = rsa_decrypt(ciphertext, d, n)
+                data = rsa_decrypt(ciphertext, d, n)
+                result["result"] = data.get("output", data) if isinstance(data, dict) else str(data)
+                result["steps"] = []
 
         elif algorithm == "sha256":
-            result = sha256_hash(text)
+            data = sha256_hash(text)
+            result["result"] = data.get("hash", data) if isinstance(data, dict) else str(data)
+            result["steps"] = []
 
         else:
             result = {"error": f"Algoritma tidak dikenal: {algorithm}"}
@@ -138,9 +152,14 @@ def run_playground(algorithm: str, mode: str, text: str, params: dict) -> dict:
         result = {"error": str(e)}
 
     elapsed = time.perf_counter() - start
-    result["execution_time_ms"] = round(elapsed * 1000, 3)
-    result["output_size"] = len(str(result.get("output", "")))
-    result["algorithm"] = algorithm
-    result["mode"] = mode
-
-    return result
+    
+    # Return with frontend-expected keys
+    return {
+        "result": result.get("result", ""),
+        "steps": result.get("steps", []),
+        "time_ms": round(elapsed * 1000, 3),
+        "output_length": len(str(result.get("result", ""))),
+        "algorithm": ALGORITHMS.get(algorithm, {}).get("name", algorithm),
+        "mode": mode,
+        "error": result.get("error")
+    } if "error" not in result else {"error": result.get("error")}
