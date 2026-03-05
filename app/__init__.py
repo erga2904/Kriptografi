@@ -7,6 +7,19 @@ from .config import Config
 from .extensions import db, csrf, login_manager, bcrypt, limiter
 
 
+def _init_directories():
+    """Lazily initialize directories (cannot be done at module import time on Vercel)."""
+    upload_folder = Config.UPLOAD_FOLDER
+    instance_dir = os.path.dirname(upload_folder)
+    
+    for dir_path in [instance_dir, upload_folder]:
+        try:
+            os.makedirs(dir_path, exist_ok=True)
+        except (OSError, IOError, PermissionError) as e:
+            # Silently ignore - Vercel has read-only filesystem
+            pass
+
+
 def create_app(config_class=Config):
     app = Flask(
         __name__,
@@ -15,11 +28,9 @@ def create_app(config_class=Config):
     )
     app.config.from_object(config_class)
 
-    # Ensure upload directory exists (with error handling for serverless)
-    try:
-        os.makedirs(app.config.get("UPLOAD_FOLDER", "instance/uploads"), exist_ok=True)
-    except (OSError, IOError) as e:
-        app.logger.warning(f"Could not create upload directory: {e}")
+    # Initialize directories lazily
+    with app.app_context():
+        _init_directories()
 
     # Initialize extensions
     db.init_app(app)
@@ -27,6 +38,27 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     bcrypt.init_app(app)
     limiter.init_app(app)
+
+    # ── JSON error handlers for API routes ───────────────────────
+    from flask import jsonify as _jsonify, request as _request
+
+    @app.errorhandler(413)
+    def request_entity_too_large(e):
+        if _request.path.startswith('/api/'):
+            return _jsonify({"error": "Ukuran file melebihi batas maksimal"}), 413
+        return e
+
+    @app.errorhandler(429)
+    def too_many_requests(e):
+        if _request.path.startswith('/api/'):
+            return _jsonify({"error": "Terlalu banyak permintaan, coba lagi nanti"}), 429
+        return e
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        if _request.path.startswith('/api/'):
+            return _jsonify({"error": "Terjadi kesalahan server"}), 500
+        return e
 
     # ── Original Blueprints ──────────────────────────────────────
     from .blueprints.main.routes import main_bp
