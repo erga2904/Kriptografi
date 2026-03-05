@@ -15,8 +15,11 @@ def create_app(config_class=Config):
     )
     app.config.from_object(config_class)
 
-    # Ensure upload directory exists
-    os.makedirs(app.config.get("UPLOAD_FOLDER", "instance/uploads"), exist_ok=True)
+    # Ensure upload directory exists (with error handling for serverless)
+    try:
+        os.makedirs(app.config.get("UPLOAD_FOLDER", "instance/uploads"), exist_ok=True)
+    except (OSError, IOError) as e:
+        app.logger.warning(f"Could not create upload directory: {e}")
 
     # Initialize extensions
     db.init_app(app)
@@ -65,8 +68,11 @@ def create_app(config_class=Config):
 
     # Create database tables
     with app.app_context():
-        from . import models  # noqa: F401
-        db.create_all()
+        try:
+            from . import models  # noqa: F401
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Could not create database tables: {e}")
 
     # CSRF exemption for all API routes
     api_blueprints = [
