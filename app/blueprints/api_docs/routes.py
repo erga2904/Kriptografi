@@ -14,7 +14,7 @@ api_docs_bp = Blueprint("api_docs", __name__)
 def endpoints():
     from flask import jsonify
     docs = {
-        "version": "2.0",
+        "version": "2.1",
         "base_url": "/api",
         "endpoints": [
             {
