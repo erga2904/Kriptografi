@@ -152,53 +152,77 @@ function kgRenderKeyField(label, value) {
 }
 
 async function kgGenRSA() {
-    const bits = document.getElementById('kg-rsa-bits').value;
-    const res = await fetch('/api/keygen/rsa', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bits:parseInt(bits)})});
-    const d = await res.json();
-    document.getElementById('kg-rsa-result').innerHTML = `
-        <div class="text-xs text-gray-500 mb-2">${d.bits}-bit RSA Keypair</div>
-        ${kgRenderKeyField('Public Key (e)', d.e)}
-        ${kgRenderKeyField('Public Key (n)', d.n)}
-        ${kgRenderKeyField('Private Key (d)', d.d)}
-        <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="p-2 rounded bg-surface-700/30"><span class="text-gray-500">p:</span> <span class="text-white font-mono">${d.p}</span></div>
-            <div class="p-2 rounded bg-surface-700/30"><span class="text-gray-500">q:</span> <span class="text-white font-mono">${d.q}</span></div>
-        </div>`;
+    const resultDiv = document.getElementById('kg-rsa-result');
+    try {
+        const bits = document.getElementById('kg-rsa-bits').value;
+        const res = await fetch('/api/keygen/rsa', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bits:parseInt(bits)})});
+        const d = await res.json();
+        if (d.error) throw new Error(d.error);
+        resultDiv.innerHTML = `
+            <div class="text-xs text-gray-500 mb-2">${d.bits}-bit RSA Keypair</div>
+            ${kgRenderKeyField('Public Key (e)', d.e)}
+            ${kgRenderKeyField('Public Key (n)', d.n)}
+            ${kgRenderKeyField('Private Key (d)', d.d)}
+            <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2 rounded bg-surface-700/30 break-all"><span class="text-gray-500">p:</span> <span class="text-white font-mono">${d.p}</span></div>
+                <div class="p-2 rounded bg-surface-700/30 break-all"><span class="text-gray-500">q:</span> <span class="text-white font-mono">${d.q}</span></div>
+            </div>`;
+    } catch(e) {
+        resultDiv.innerHTML = `<div class="text-red-400 text-sm">❌ Error: ${e.message}</div>`;
+    }
 }
 
 async function kgGenAES() {
-    const bits = document.getElementById('kg-aes-bits').value;
-    const res = await fetch('/api/keygen/aes', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bits:parseInt(bits)})});
-    const d = await res.json();
-    document.getElementById('kg-aes-result').innerHTML = `
-        <div class="text-xs text-gray-500 mb-2">AES-${d.bits} Key</div>
-        ${kgRenderKeyField('Hex', d.hex)}
-        ${kgRenderKeyField('Base64', d.base64)}
-        <div class="text-xs text-gray-500">Panjang: ${d.bytes} bytes</div>`;
+    const resultDiv = document.getElementById('kg-aes-result');
+    try {
+        const bits = document.getElementById('kg-aes-bits').value;
+        const res = await fetch('/api/keygen/aes', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bits:parseInt(bits)})});
+        const d = await res.json();
+        if (d.error) throw new Error(d.error);
+        resultDiv.innerHTML = `
+            <div class="text-xs text-gray-500 mb-2">AES-${d.bits} Key</div>
+            ${kgRenderKeyField('Hex', d.hex)}
+            ${kgRenderKeyField('Base64', d.base64)}
+            <div class="text-xs text-gray-500">Panjang: ${d.bytes} bytes</div>`;
+    } catch(e) {
+        resultDiv.innerHTML = `<div class="text-red-400 text-sm">❌ Error: ${e.message}</div>`;
+    }
 }
 
 async function kgGenRandom() {
-    const len = document.getElementById('kg-rand-len').value;
-    const charset = document.getElementById('kg-rand-charset').value;
-    const res = await fetch('/api/keygen/random', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({length:parseInt(len), charset})});
-    const d = await res.json();
-    document.getElementById('kg-rand-result').innerHTML = `
-        ${kgRenderKeyField('Kunci', d.key)}
-        <div class="grid grid-cols-3 gap-2 text-xs">
-            <div class="p-2 rounded bg-surface-700/30 text-center"><span class="text-gray-500">Panjang</span><br><span class="text-white">${d.length}</span></div>
-            <div class="p-2 rounded bg-surface-700/30 text-center"><span class="text-gray-500">Entropi</span><br><span class="text-accent-light">${d.entropy_bits?.toFixed(1)} bit</span></div>
-            <div class="p-2 rounded bg-surface-700/30 text-center"><span class="text-gray-500">Kekuatan</span><br><span class="text-white">${d.strength}</span></div>
-        </div>`;
+    const resultDiv = document.getElementById('kg-rand-result');
+    try {
+        const len = document.getElementById('kg-rand-len').value;
+        const charset = document.getElementById('kg-rand-charset').value;
+        const res = await fetch('/api/keygen/random', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({length:parseInt(len), charset})});
+        const d = await res.json();
+        if (d.error) throw new Error(d.error);
+        resultDiv.innerHTML = `
+            ${kgRenderKeyField('Kunci', d.key)}
+            <div class="grid grid-cols-3 gap-2 text-xs">
+                <div class="p-2 rounded bg-surface-700/30 text-center"><span class="text-gray-500">Panjang</span><br><span class="text-white">${d.length || 0}</span></div>
+                <div class="p-2 rounded bg-surface-700/30 text-center"><span class="text-gray-500">Entropi</span><br><span class="text-accent-light">${(d.entropy_bits || 0).toFixed(1)} bit</span></div>
+                <div class="p-2 rounded bg-surface-700/30 text-center"><span class="text-gray-500">Kekuatan</span><br><span class="text-white">${d.strength || '—'}</span></div>
+            </div>`;
+    } catch(e) {
+        resultDiv.innerHTML = `<div class="text-red-400 text-sm">❌ Error: ${e.message}</div>`;
+    }
 }
 
 async function kgGenHMAC() {
-    const bits = document.getElementById('kg-hmac-bits').value;
-    const res = await fetch('/api/keygen/hmac', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bits:parseInt(bits)})});
-    const d = await res.json();
-    document.getElementById('kg-hmac-result').innerHTML = `
-        <div class="text-xs text-gray-500 mb-2">HMAC-${d.bits} Key</div>
-        ${kgRenderKeyField('Hex', d.hex)}
-        ${kgRenderKeyField('Base64', d.base64)}`;
+    const resultDiv = document.getElementById('kg-hmac-result');
+    try {
+        const bits = document.getElementById('kg-hmac-bits').value;
+        const res = await fetch('/api/keygen/hmac', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({bits:parseInt(bits)})});
+        const d = await res.json();
+        if (d.error) throw new Error(d.error);
+        resultDiv.innerHTML = `
+            <div class="text-xs text-gray-500 mb-2">HMAC-${d.bits} Key</div>
+            ${kgRenderKeyField('Hex', d.hex)}
+            ${kgRenderKeyField('Base64', d.base64)}`;
+    } catch(e) {
+        resultDiv.innerHTML = `<div class="text-red-400 text-sm">❌ Error: ${e.message}</div>`;
+    }
 }
 </script>
 {% endblock %}
