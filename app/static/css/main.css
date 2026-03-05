@@ -1062,25 +1062,20 @@ details[open] > summary::before {
         font-size: 0.75rem;
     }
     
-    /* Hide non-essential UI elements */
+    /* Sidebar adjustments - keep text visible */
     .sidebar-section-label {
-        font-size: 0.6rem;
-        padding: 0.5rem 0rem;
-    }
-    
-    .nav-link span:not(:first-child) {
-        display: none;
+        font-size: 0.65rem;
+        padding: 0.5rem 0.625rem;
     }
     
     .nav-link {
-        justify-content: center;
-        padding: 0.5rem;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.8125rem;
     }
     
-    /* Icon-only nav on ultra-small screens */
     .nav-link svg {
-        width: 20px !important;
-        height: 20px !important;
+        width: 18px !important;
+        height: 18px !important;
     }
 }
 
