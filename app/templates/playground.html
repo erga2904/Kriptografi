@@ -89,7 +89,7 @@
         <!-- Result -->
         <div>
             <label class="label">Hasil</label>
-            <div id="pg-result" class="code-block min-h-[120px] select-all">
+            <div id="pg-result" class="code-block min-h-[120px] select-all break-all">
                 <span class="text-gray-600 italic">Hasil akan muncul di sini...</span>
             </div>
         </div>
@@ -168,6 +168,7 @@ function pgUpdateParams() {
 async function pgRun() {
     const btn = document.getElementById('pg-run');
     btn.classList.add('loading');
+    btn.disabled = true;
     const algo = document.getElementById('pg-algorithm').value;
     const text = document.getElementById('pg-text').value;
     const params = {};
@@ -181,16 +182,21 @@ async function pgRun() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({algorithm: algo, mode: pgMode, text, params})
         });
+        
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
+        
         if (data.error) {
-            document.getElementById('pg-result').innerHTML = `<span class="text-red-400">${data.error}</span>`;
+            document.getElementById('pg-result').innerHTML = `<span class="text-red-400">❌ ${data.error}</span>`;
+            document.getElementById('pg-meta').classList.add('hidden');
+            document.getElementById('pg-steps-wrap').classList.add('hidden');
         } else {
             document.getElementById('pg-result').textContent = data.result || '';
             document.getElementById('pg-meta').classList.remove('hidden');
-            document.getElementById('pg-meta-algo').textContent = data.algorithm;
-            document.getElementById('pg-meta-time').textContent = data.time_ms + ' ms';
-            document.getElementById('pg-meta-size').textContent = data.output_length + ' chars';
-            document.getElementById('pg-timing').textContent = data.time_ms + ' ms';
+            document.getElementById('pg-meta-algo').textContent = data.algorithm || algo;
+            document.getElementById('pg-meta-time').textContent = (data.time_ms || 0) + ' ms';
+            document.getElementById('pg-meta-size').textContent = (data.output_length || 0) + ' chars';
+            document.getElementById('pg-timing').textContent = (data.time_ms || 0) + ' ms';
             document.getElementById('pg-timing').classList.remove('hidden');
             if (data.steps && data.steps.length) {
                 document.getElementById('pg-steps-wrap').classList.remove('hidden');
@@ -200,9 +206,13 @@ async function pgRun() {
             }
         }
     } catch(e) {
-        document.getElementById('pg-result').innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+        document.getElementById('pg-result').innerHTML = `<span class="text-red-400">❌ Error: ${e.message}</span>`;
+        document.getElementById('pg-meta').classList.add('hidden');
+        console.error('Playground error:', e);
+    } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
     }
-    btn.classList.remove('loading');
 }
 
 function pgCopy() {
