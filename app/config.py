@@ -16,19 +16,10 @@ if IS_VERCEL or os.environ.get("DATABASE_URL"):
 else:
     INSTANCE_DIR = os.path.join(BASE_DIR, '..', 'instance')
 
-# Ensure instance directory exists for SQLite
-try:
-    os.makedirs(INSTANCE_DIR, exist_ok=True)
-except (OSError, IOError):
-    INSTANCE_DIR = "/tmp"
-    os.makedirs(INSTANCE_DIR, exist_ok=True)
+# DON'T create directories here - it fails on Vercel read-only filesystem
+# Directories will be created lazily in app context
 
 UPLOAD_DIR = os.path.join(INSTANCE_DIR, 'uploads')
-try:
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-except (OSError, IOError):
-    UPLOAD_DIR = "/tmp/uploads"
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Build database path with proper format for SQLAlchemy
 DB_PATH = os.path.abspath(os.path.join(INSTANCE_DIR, 'cipherlab.db'))
