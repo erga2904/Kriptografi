@@ -81,6 +81,7 @@ let bmChart = null;
 async function bmRun() {
     const btn = document.getElementById('bm-run');
     btn.classList.add('loading');
+    btn.disabled = true;
 
     const sizes = document.getElementById('bm-sizes').value.split(',').map(s => parseInt(s.trim())).filter(n => n > 0);
     const iterations = parseInt(document.getElementById('bm-iter').value);
@@ -90,7 +91,10 @@ async function bmRun() {
             method: 'POST', headers: {'Content-Type':'application/json'},
             body: JSON.stringify({text_sizes: sizes, iterations})
         });
+        
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const d = await res.json();
+        if (d.error) throw new Error(d.error);
 
         // Render chart
         if (bmChart) bmChart.destroy();
@@ -139,7 +143,7 @@ async function bmRun() {
 
         const tbody = document.getElementById('bm-tbody');
         tbody.innerHTML = '';
-        for (const [algo, info] of Object.entries(d.results)) {
+        for (const [algo, timings] of Object.entries(d.results)) {
             const tr = document.createElement('tr');
             tr.className = 'border-b border-border-subtle hover:bg-surface-700/30';
             const complexity = d.complexity[algo] || {};
@@ -149,16 +153,19 @@ async function bmRun() {
                 <td class="py-2 px-3 font-mono text-xs text-gray-500">${complexity.time || '—'}</td>
             `;
             sizes.forEach(s => {
-                const val = info[s];
+                const val = timings[s];
                 cells += `<td class="py-2 px-3 text-right font-mono text-accent-light">${val !== undefined ? val.toFixed(3) : '—'}</td>`;
             });
             tr.innerHTML = cells;
             tbody.appendChild(tr);
         }
     } catch(e) {
-        alert('Error: ' + e.message);
+        showToast('Benchmark error: ' + e.message, 'error');
+        console.error('Benchmark error:', e);
+    } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
     }
-    btn.classList.remove('loading');
 }
 </script>
 {% endblock %}
