@@ -119,11 +119,13 @@ function chTab(t) {
 }
 
 async function chLoadList() {
-    const res = await fetch('/api/challenges/list');
-    const data = await res.json();
     const el = document.getElementById('ch-list');
-    el.innerHTML = '';
-    for (const [id, ch] of Object.entries(data)) {
+    try {
+        const res = await fetch('/api/challenges/list');
+        if (!res.ok) throw new Error('Gagal memuat daftar tantangan');
+        const data = await res.json();
+        el.innerHTML = '';
+        for (const [id, ch] of Object.entries(data)) {
         const div = document.createElement('button');
         div.className = 'w-full text-left p-3 rounded-lg bg-surface-700/40 border border-border-subtle hover:border-accent/20 transition-all text-sm';
         div.innerHTML = `
@@ -136,16 +138,22 @@ async function chLoadList() {
         `;
         div.onclick = () => chStart(id);
         el.appendChild(div);
+        }
+    } catch(e) {
+        el.innerHTML = `<p class="text-red-400 text-sm">❌ ${e.message}</p>`;
+        console.error('Error loading challenges:', e);
     }
 }
 
 async function chStart(challengeId) {
-    const res = await fetch('/api/challenges/generate', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({challenge_id: challengeId})
-    });
-    const d = await res.json();
-    if (d.error) return alert(d.error);
+    try {
+        const res = await fetch('/api/challenges/generate', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({challenge_id: challengeId})
+        });
+        if (!res.ok) throw new Error('Gagal membuat tantangan');
+        const d = await res.json();
+        if (d.error) throw new Error(d.error);
 
     chState = {id: challengeId, answer: d.answer_hash, hints: d.hints || [], hintsShown: 0, startTime: Date.now(), timerInterval: null};
     document.getElementById('ch-empty').classList.add('hidden');
@@ -165,6 +173,10 @@ async function chStart(challengeId) {
         const m = Math.floor(s / 60);
         document.getElementById('ch-timer').textContent = `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
     }, 1000);
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+        console.error('Challenge start error:', e);
+    }
 }
 
 function chShowHint() {
@@ -179,20 +191,22 @@ function chShowHint() {
 }
 
 async function chSubmit() {
-    if (chState.timerInterval) clearInterval(chState.timerInterval);
-    const timeSeconds = Math.floor((Date.now() - chState.startTime) / 1000);
-    const answer = document.getElementById('ch-answer').value;
+    try {
+        if (chState.timerInterval) clearInterval(chState.timerInterval);
+        const timeSeconds = Math.floor((Date.now() - chState.startTime) / 1000);
+        const answer = document.getElementById('ch-answer').value;
 
-    const res = await fetch('/api/challenges/check', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-            answer, correct_answer: chState.answer,
-            challenge_id: chState.id,
-            time_seconds: timeSeconds,
-            hints_used: chState.hintsShown
-        })
-    });
-    const d = await res.json();
+        const res = await fetch('/api/challenges/check', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                answer, correct_answer: chState.answer,
+                challenge_id: chState.id,
+                time_seconds: timeSeconds,
+                hints_used: chState.hintsShown
+            })
+        });
+        if (!res.ok) throw new Error('Gagal memeriksa jawaban');
+        const d = await res.json();
     const fb = document.getElementById('ch-feedback');
     fb.classList.remove('hidden');
 
@@ -211,16 +225,22 @@ async function chSubmit() {
             <div class="text-xs text-gray-500 mt-1">Coba lagi — periksa kapitalisasi dan spasi</div>
         `;
     }
+    } catch(e) {
+        showToast('Error: ' + e.message, 'error');
+        console.error('Submit error:', e);
+    }
 }
 
 async function chLoadLeaderboard() {
-    const res = await fetch('/api/challenges/leaderboard?limit=20');
-    const data = await res.json();
     const el = document.getElementById('ch-leaderboard');
-    if (!data.length) {
-        el.innerHTML = '<p class="text-gray-500 text-sm">Belum ada skor.</p>';
-        return;
-    }
+    try {
+        const res = await fetch('/api/challenges/leaderboard?limit=20');
+        if (!res.ok) throw new Error('Gagal memuat leaderboard');
+        const data = await res.json();
+        if (!data || !data.length) {
+            el.innerHTML = '<p class="text-gray-500 text-sm">Belum ada skor.</p>';
+            return;
+        }
     el.innerHTML = `<div class="grid grid-cols-5 gap-2 text-xs text-gray-500 px-3 pb-2 border-b border-border-subtle">
         <span>#</span><span>Pengguna</span><span>Tantangan</span><span>Skor</span><span>Waktu</span>
     </div>` + data.map((s, i) => `
@@ -232,6 +252,10 @@ async function chLoadLeaderboard() {
             <span class="text-gray-500 text-xs">${s.time_seconds}s</span>
         </div>
     `).join('');
+    } catch(e) {
+        el.innerHTML = `<p class="text-red-400 text-sm">❌ ${e.message}</p>`;
+        console.error('Leaderboard error:', e);
+    }
 }
 
 chLoadList();
