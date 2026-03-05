@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Analyzer — CipherLab{% endblock %}
+{% block page_title %}Crypto Analyzer{% endblock %}
+{% block page_subtitle %}Deteksi cipher, analisis entropi, dan distribusi frekuensi{% endblock %}
+
+{% block content %}
+<!-- Panduan -->
+<div class="guide-panel card-base mb-6 rounded-xl" id="guide-panel">
+    <button onclick="toggleGuide()" class="guide-toggle">
+        <div class="guide-icon"><svg class="w-4 h-4 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg></div>
+        <div><span class="text-white font-semibold text-sm">Panduan & Tutorial</span><br><span class="text-gray-500 text-xs">Klik untuk melihat cara menggunakan Crypto Analyzer</span></div>
+        <svg class="guide-chevron w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+    </button>
+    <div class="guide-content">
+        <div class="space-y-3">
+            <div class="guide-step"><span class="step-number">1</span><div><h4 class="text-white text-sm font-medium">Tab Deteksi Cipher</h4><p class="text-gray-500 text-xs">Tempel ciphertext, lalu klik "Deteksi". Sistem akan menganalisis pola dan menebak jenis cipher yang digunakan.</p></div></div>
+            <div class="guide-divider"></div>
+            <div class="guide-step"><span class="step-number">2</span><div><h4 class="text-white text-sm font-medium">Baca Metrik</h4><p class="text-gray-500 text-xs">Perhatikan nilai <strong>Entropi</strong> (keacakan), <strong>IC</strong> (index of coincidence), dan <strong>Chi-squared</strong> untuk memahami karakteristik teks.</p></div></div>
+            <div class="guide-divider"></div>
+            <div class="guide-step"><span class="step-number">3</span><div><h4 class="text-white text-sm font-medium">Tab Analisis Entropi</h4><p class="text-gray-500 text-xs">Masukkan teks untuk melihat distribusi frekuensi huruf dalam bentuk grafik batang dan statistik detail.</p></div></div>
+        </div>
+        <div class="guide-tip">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+            <p class="text-yellow-400/80 text-xs"><strong>Tips:</strong> Entropi Shannon maksimum untuk bahasa Inggris ≈ 4.7 bit/karakter. Teks terenkripsi dengan baik memiliki entropi mendekati 4.7. <a href="/learning" class="text-accent-light hover:underline">Baca materi &rarr;</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="space-y-6 animate-fade-in">
+
+    <!-- Tabs -->
+    <div class="flex gap-2">
+        <button onclick="azTab('detect')" id="az-tab-detect" class="cipher-tab active">Deteksi Cipher</button>
+        <button onclick="azTab('entropy')" id="az-tab-entropy" class="cipher-tab">Analisis Entropi</button>
+    </div>
+
+    <!-- ═══ DETECT TAB ═══ -->
+    <div id="az-detect" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6 space-y-4">
+            <h3 class="text-white font-semibold text-sm">Teks untuk Dianalisis</h3>
+            <textarea id="az-detect-input" class="input-field mono" rows="8" placeholder="Tempel ciphertext di sini untuk mendeteksi jenis cipher yang digunakan..."></textarea>
+            <button class="btn-primary w-full" onclick="azDetect()">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                Analisis
+            </button>
+        </div>
+        <div class="card-base p-6 space-y-4">
+            <h3 class="text-white font-semibold text-sm">Hasil Deteksi</h3>
+            <div id="az-detect-result" class="space-y-3">
+                <p class="text-gray-500 text-sm italic">Hasil analisis akan muncul di sini...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ ENTROPY TAB ═══ -->
+    <div id="az-entropy" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6 space-y-4">
+            <h3 class="text-white font-semibold text-sm">Teks Input</h3>
+            <textarea id="az-ent-plain" class="input-field mono" rows="4" placeholder="Teks asli (plaintext)..."></textarea>
+            <textarea id="az-ent-cipher" class="input-field mono" rows="4" placeholder="Teks terenkripsi (opsional, untuk perbandingan)..."></textarea>
+            <button class="btn-primary w-full" onclick="azEntropy()">Hitung Entropi</button>
+        </div>
+        <div class="card-base p-6 space-y-4">
+            <h3 class="text-white font-semibold text-sm">Hasil Entropi</h3>
+            <div id="az-ent-result" class="space-y-3">
+                <p class="text-gray-500 text-sm italic">Hasil akan muncul di sini...</p>
+            </div>
+            <!-- Chart -->
+            <div class="mt-4" style="height: 250px;">
+                <canvas id="az-ent-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let azEntChart = null;
+
+function azTab(tab) {
+    document.getElementById('az-detect').classList.toggle('hidden', tab !== 'detect');
+    document.getElementById('az-entropy').classList.toggle('hidden', tab !== 'entropy');
+    document.getElementById('az-tab-detect').classList.toggle('active', tab === 'detect');
+    document.getElementById('az-tab-entropy').classList.toggle('active', tab === 'entropy');
+}
+
+async function azDetect() {
+    const text = document.getElementById('az-detect-input').value;
+    if (!text.trim()) return;
+    const res = await fetch('/api/analyzer/detect', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({text})
+    });
+    const d = await res.json();
+    const el = document.getElementById('az-detect-result');
+    el.innerHTML = `
+        <div class="p-4 rounded-lg bg-accent/5 border border-accent/15">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="pulse-dot"></div>
+                <span class="text-accent-light font-semibold text-sm">Deteksi: ${d.detected_type || 'Tidak diketahui'}</span>
+            </div>
+            <p class="text-gray-400 text-xs">${d.description || ''}</p>
+            <div class="text-xs text-gray-500 mt-2">Kepercayaan: ${d.confidence || 'N/A'}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-3">
+            <div class="p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                <div class="text-xs text-gray-500">Entropi Shannon</div>
+                <div class="text-white font-mono text-sm">${(d.metrics?.entropy ?? 0).toFixed(4)}</div>
+            </div>
+            <div class="p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                <div class="text-xs text-gray-500">Index of Coincidence</div>
+                <div class="text-white font-mono text-sm">${(d.metrics?.ic ?? 0).toFixed(6)}</div>
+            </div>
+            <div class="p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                <div class="text-xs text-gray-500">Chi-Squared</div>
+                <div class="text-white font-mono text-sm">${(d.metrics?.chi_squared ?? 0).toFixed(2)}</div>
+            </div>
+            <div class="p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                <div class="text-xs text-gray-500">Panjang Teks</div>
+                <div class="text-white font-mono text-sm">${d.metrics?.text_length ?? 0}</div>
+            </div>
+        </div>
+    `;
+}
+
+async function azEntropy() {
+    const text = document.getElementById('az-ent-plain').value;
+    const encrypted = document.getElementById('az-ent-cipher').value;
+    if (!text.trim()) return;
+    const res = await fetch('/api/analyzer/entropy', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({text, encrypted_text: encrypted || undefined})
+    });
+    const d = await res.json();
+    const el = document.getElementById('az-ent-result');
+
+    let html = `
+        <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                <div class="text-xs text-gray-500">Entropi</div>
+                <div class="text-white font-mono">${d.entropy?.toFixed(4) || '—'}</div>
+            </div>
+            <div class="p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                <div class="text-xs text-gray-500">Skor Acak</div>
+                <div class="text-accent-light font-mono">${d.randomness_score || '—'}</div>
+            </div>
+        </div>`;
+
+    if (d.comparison) {
+        html += `
+        <div class="mt-3 p-3 rounded-lg bg-accent/5 border border-accent/15">
+            <div class="text-xs text-gray-400 mb-1">Perbandingan</div>
+            <div class="text-sm text-white">Plain: <span class="font-mono text-accent-light">${d.comparison.original_entropy?.toFixed(4)}</span> → Cipher: <span class="font-mono text-accent-light">${d.comparison.encrypted_entropy?.toFixed(4)}</span></div>
+            <div class="text-xs text-gray-500 mt-1">Perubahan: ${d.comparison.entropy_change?.toFixed(4)}</div>
+        </div>`;
+    }
+    el.innerHTML = html;
+
+    // Chart
+    if (d.distribution) {
+        if (azEntChart) azEntChart.destroy();
+        const labels = Object.keys(d.distribution);
+        const values = Object.values(d.distribution);
+        azEntChart = new Chart(document.getElementById('az-ent-chart'), {
+            type: 'bar',
+            data: {
+                labels, datasets: [{
+                    label: 'Frekuensi',
+                    data: values,
+                    backgroundColor: 'rgba(99,102,241,0.4)',
+                    borderColor: 'rgba(99,102,241,0.8)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {legend:{display:false}},
+                scales: {
+                    x: {ticks:{color:'#64748B',font:{size:10}}, grid:{display:false}},
+                    y: {ticks:{color:'#64748B'}, grid:{color:'rgba(148,163,184,0.06)'}}
+                }
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

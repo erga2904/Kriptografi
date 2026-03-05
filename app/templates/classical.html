@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Sandi Klasik — CipherLab{% endblock %}
+{% block page_title %}Sandi Klasik{% endblock %}
+{% block page_subtitle %}Enkripsi dan dekripsi dengan algoritma historis{% endblock %}
+
+{% block content %}
+<!-- Cipher Selector Tabs -->
+<div class="flex gap-2 mb-6 overflow-x-auto pb-2 flex-wrap">
+    <button onclick="selectCipher('caesar')" id="tab-caesar" class="cipher-tab active">Caesar</button>
+    <button onclick="selectCipher('vigenere')" id="tab-vigenere" class="cipher-tab">Vigenère</button>
+    <button onclick="selectCipher('affine')" id="tab-affine" class="cipher-tab">Affine</button>
+    <button onclick="selectCipher('hill')" id="tab-hill" class="cipher-tab">Hill</button>
+    <button onclick="selectCipher('playfair')" id="tab-playfair" class="cipher-tab">Playfair</button>
+</div>
+
+<!-- ═══════════════ CAESAR ═══════════════ -->
+<div id="panel-caesar" class="cipher-panel">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Sandi Caesar</h3>
+            <p class="text-sm text-gray-500 mb-5">Geser setiap huruf sebanyak posisi tetap. E(x) = (x + k) mod 26</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Teks Biasa / Teks Sandi</label>
+                    <textarea id="caesar-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
+                </div>
+                <div>
+                    <label class="label">Pergeseran (k)</label>
+                    <input type="number" id="caesar-shift" class="input-field" value="3" min="0" max="25">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="runCipher('caesar','encrypt')" class="btn-primary flex-1">Enkripsi</button>
+                    <button onclick="runCipher('caesar','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
+                </div>
+            </div>
+        </div>
+        <div id="result-caesar" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Hasil</h3>
+            <div id="result-caesar-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ VIGENERE ═══════════════ -->
+<div id="panel-vigenere" class="cipher-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Sandi Vigenère</h3>
+            <p class="text-sm text-gray-500 mb-5">Substitusi polialfabetik menggunakan kata kunci. E(pᵢ) = (pᵢ + kᵢ) mod 26</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Teks Biasa / Teks Sandi</label>
+                    <textarea id="vigenere-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
+                </div>
+                <div>
+                    <label class="label">Kunci (huruf saja)</label>
+                    <input type="text" id="vigenere-key" class="input-field" placeholder="RAHASIA">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="runCipher('vigenere','encrypt')" class="btn-primary flex-1">Enkripsi</button>
+                    <button onclick="runCipher('vigenere','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
+                </div>
+            </div>
+        </div>
+        <div id="result-vigenere" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Hasil</h3>
+            <div id="result-vigenere-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ AFFINE ═══════════════ -->
+<div id="panel-affine" class="cipher-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Sandi Affine</h3>
+            <p class="text-sm text-gray-500 mb-5">E(x) = (ax + b) mod 26 di mana gcd(a, 26) = 1</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Teks Biasa / Teks Sandi</label>
+                    <textarea id="affine-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="label">a (koprima dengan 26)</label>
+                        <input type="number" id="affine-a" class="input-field" value="5">
+                    </div>
+                    <div>
+                        <label class="label">b</label>
+                        <input type="number" id="affine-b" class="input-field" value="8">
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="runCipher('affine','encrypt')" class="btn-primary flex-1">Enkripsi</button>
+                    <button onclick="runCipher('affine','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
+                </div>
+            </div>
+        </div>
+        <div id="result-affine" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Hasil</h3>
+            <div id="result-affine-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ HILL ═══════════════ -->
+<div id="panel-hill" class="cipher-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Sandi Hill</h3>
+            <p class="text-sm text-gray-500 mb-5">Perkalian matriks modulo 26. C = K · P mod 26</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Teks Biasa / Teks Sandi</label>
+                    <textarea id="hill-text" class="input-field h-24" placeholder="Masukkan pesan (huruf saja)..."></textarea>
+                </div>
+                <div>
+                    <label class="label">Matriks Kunci (2×2, pisahkan dengan koma)</label>
+                    <input type="text" id="hill-key" class="input-field font-mono" placeholder="6,24,1;13,16,10;20,17,15" value="3,3;2,5">
+                    <p class="text-xs text-gray-500 mt-1">Format: baris1_a,baris1_b;baris2_a,baris2_b (misal 3,3;2,5 untuk 2×2)</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="runCipher('hill','encrypt')" class="btn-primary flex-1">Enkripsi</button>
+                    <button onclick="runCipher('hill','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
+                </div>
+            </div>
+        </div>
+        <div id="result-hill" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Hasil</h3>
+            <div id="result-hill-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ PLAYFAIR ═══════════════ -->
+<div id="panel-playfair" class="cipher-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Sandi Playfair</h3>
+            <p class="text-sm text-gray-500 mb-5">Substitusi digraf menggunakan kotak Polybius 5×5.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Teks Biasa / Teks Sandi</label>
+                    <textarea id="playfair-text" class="input-field h-24" placeholder="Masukkan pesan Anda..."></textarea>
+                </div>
+                <div>
+                    <label class="label">Kunci</label>
+                    <input type="text" id="playfair-key" class="input-field" placeholder="MONARCHY">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="runCipher('playfair','encrypt')" class="btn-primary flex-1">Enkripsi</button>
+                    <button onclick="runCipher('playfair','decrypt')" class="btn-ghost flex-1">Dekripsi</button>
+                </div>
+            </div>
+        </div>
+        <div id="result-playfair" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Hasil</h3>
+            <div id="result-playfair-content"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const CIPHERS = ['caesar','vigenere','affine','hill','playfair'];
+
+function selectCipher(name) {
+    CIPHERS.forEach(c => {
+        document.getElementById('panel-' + c).classList.toggle('hidden', c !== name);
+        document.getElementById('tab-' + c).classList.toggle('active', c === name);
+    });
+}
+
+function parseHillKey(str) {
+    return str.split(';').map(row => row.split(',').map(Number));
+}
+
+async function runCipher(cipher, mode) {
+    const btn = event.target;
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    let body = { mode };
+    switch(cipher) {
+        case 'caesar':
+            body.text = document.getElementById('caesar-text').value;
+            body.shift = parseInt(document.getElementById('caesar-shift').value);
+            break;
+        case 'vigenere':
+            body.text = document.getElementById('vigenere-text').value;
+            body.key = document.getElementById('vigenere-key').value;
+            break;
+        case 'affine':
+            body.text = document.getElementById('affine-text').value;
+            body.a = parseInt(document.getElementById('affine-a').value);
+            body.b = parseInt(document.getElementById('affine-b').value);
+            break;
+        case 'hill':
+            body.text = document.getElementById('hill-text').value;
+            body.key_matrix = parseHillKey(document.getElementById('hill-key').value);
+            break;
+        case 'playfair':
+            body.text = document.getElementById('playfair-text').value;
+            body.key = document.getElementById('playfair-key').value;
+            break;
+    }
+
+    try {
+        const res = await fetch('/api/classical/' + cipher, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.error) {
+            showError('result-' + cipher + '-content', data.error);
+        } else {
+            renderClassicalResult(cipher, data);
+        }
+        document.getElementById('result-' + cipher).classList.remove('hidden');
+        document.getElementById('result-' + cipher).classList.add('animate-slide-up');
+    } catch(e) {
+        showError('result-' + cipher + '-content', 'Request failed: ' + e.message);
+        document.getElementById('result-' + cipher).classList.remove('hidden');
+    } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+}
+
+function showError(id, msg) {
+    document.getElementById(id).innerHTML = `<div class="text-red-400 text-sm">${msg}</div>`;
+}
+
+function renderClassicalResult(cipher, data) {
+    const container = document.getElementById('result-' + cipher + '-content');
+    let html = '';
+
+    // Output
+    html += `<div class="mb-4">
+        <span class="label">Keluaran</span>
+        <div class="font-mono text-accent-light bg-surface-900 p-3 rounded-lg border border-border-subtle text-sm break-all select-all">${escapeHtml(data.output)}</div>
+    </div>`;
+
+    // Math formula
+    if (data.math) {
+        html += `<div class="mb-4">
+            <span class="label">Rumus</span>
+            <div class="font-mono text-sm text-gray-300 bg-surface-900 p-3 rounded-lg border border-border-subtle">${escapeHtml(data.math)}</div>
+        </div>`;
+    }
+
+    // Playfair matrix
+    if (cipher === 'playfair' && data.matrix) {
+        html += `<div class="mb-4"><span class="label">Matriks 5×5</span><div class="grid grid-cols-5 gap-1 max-w-[200px]">`;
+        data.matrix.forEach(row => {
+            row.forEach(ch => {
+                html += `<div class="w-9 h-9 flex items-center justify-center bg-surface-900 border border-border-subtle rounded text-sm font-mono text-accent-light">${ch}</div>`;
+            });
+        });
+        html += `</div></div>`;
+    }
+
+    // Steps (collapsible)
+    if (data.steps && data.steps.length > 0) {
+        html += `<details class="mt-4">
+            <summary class="cursor-pointer text-sm text-gray-400 hover:text-gray-200 transition-colors select-none">
+                Tampilkan ${data.steps.length} langkah
+            </summary>
+            <div class="mt-3 space-y-2 max-h-64 overflow-y-auto pr-2">`;
+        data.steps.forEach((step, i) => {
+            html += `<div class="flex items-start gap-3 text-xs font-mono bg-surface-900 p-2.5 rounded border border-border-subtle">
+                <span class="text-gray-500 flex-shrink-0 w-6">${i}</span>
+                <span class="text-gray-300">${escapeHtml(step.formula || step.rule || JSON.stringify(step))}</span>
+                <span class="text-accent-light ml-auto flex-shrink-0">${escapeHtml(step.result || '')}</span>
+            </div>`;
+        });
+        html += `</div></details>`;
+    }
+
+    container.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    if (typeof str !== 'string') str = String(str);
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

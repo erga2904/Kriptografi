@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+{% block title %}Sudut Pembelajaran — CipherLab{% endblock %}
+{% block page_title %}Sudut Pembelajaran{% endblock %}
+{% block page_subtitle %}Pelajari dasar-dasar kriptografi dari konsep hingga implementasi{% endblock %}
+
+{% block content %}
+<div class="space-y-8 animate-fade-in">
+
+    <!-- Intro -->
+    <div class="card-base p-6 feature-card">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>
+            </div>
+            <div>
+                <h2 class="text-white font-bold text-lg mb-1">Selamat Datang di Sudut Pembelajaran</h2>
+                <p class="text-gray-400 leading-relaxed text-sm">
+                    Halaman ini berisi materi pembelajaran kriptografi yang disusun dari dasar hingga lanjutan.
+                    Setiap bab mencakup teori, rumus, contoh, serta tautan ke alat interaktif CipherLab yang terkait.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ BAB 1: PENGANTAR ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="step-number">1</span>
+            <h3 class="text-white font-bold text-base">Apa Itu Kriptografi?</h3>
+            <span class="badge-accent ml-auto">Dasar</span>
+        </div>
+        <div class="text-gray-400 text-sm leading-relaxed space-y-3">
+            <p>
+                <strong class="text-gray-300">Kriptografi</strong> (dari bahasa Yunani: <em>kryptós</em> = tersembunyi, <em>gráphein</em> = menulis)
+                adalah ilmu dan seni menyembunyikan informasi agar hanya pihak yang berwenang yang dapat membacanya.
+            </p>
+            <p>Kriptografi modern memiliki empat tujuan utama:</p>
+            <div class="concept-grid mt-4">
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Kerahasiaan (Confidentiality)</h4>
+                    <p class="text-gray-500 text-xs">Menjamin hanya pihak berwenang yang bisa membaca data.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Integritas (Integrity)</h4>
+                    <p class="text-gray-500 text-xs">Memastikan data tidak diubah selama transmisi.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Autentikasi (Authentication)</h4>
+                    <p class="text-gray-500 text-xs">Memverifikasi identitas pengirim pesan.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Non-Repudiasi (Non-Repudiation)</h4>
+                    <p class="text-gray-500 text-xs">Pengirim tidak dapat menyangkal telah mengirim pesan.</p>
+                </div>
+            </div>
+        </div>
+        <div class="guide-tip mt-4">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+            <p class="text-yellow-400/80 text-xs leading-relaxed"><strong>Istilah penting:</strong> <em>Plaintext</em> = pesan asli, <em>Ciphertext</em> = pesan terenkripsi, <em>Key</em> = kunci, <em>Encrypt</em> = mengenkripsi, <em>Decrypt</em> = mendekripsi.</p>
+        </div>
+    </div>
+
+    <!-- ═══════════ BAB 2: SANDI KLASIK ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="step-number">2</span>
+            <h3 class="text-white font-bold text-base">Sandi Klasik (Classical Ciphers)</h3>
+            <span class="badge-accent ml-auto">Dasar</span>
+        </div>
+        <div class="text-gray-400 text-sm leading-relaxed space-y-3">
+            <p>Sandi klasik adalah teknik kriptografi yang dikembangkan sebelum era komputer. Meskipun tidak aman untuk penggunaan modern, memahaminya penting sebagai fondasi.</p>
+
+            <div class="concept-grid mt-4">
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Caesar Cipher</h4>
+                    <p class="text-gray-500 text-xs mb-2">Mengganti setiap huruf dengan huruf lain yang memiliki jarak tetap dalam alfabet. Digunakan oleh Julius Caesar.</p>
+                    <span class="concept-formula">E(x) = (x + k) mod 26</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Vigenère Cipher</h4>
+                    <p class="text-gray-500 text-xs mb-2">Menggunakan kunci berupa kata untuk melakukan substitusi polialfabetik — setiap huruf kunci menentukan pergeseran yang berbeda.</p>
+                    <span class="concept-formula">E(x) = (x + k[i]) mod 26</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Affine Cipher</h4>
+                    <p class="text-gray-500 text-xs mb-2">Kombinasi perkalian dan penambahan modular. Kunci terdiri dari dua bilangan (a, b) dimana a coprime dengan 26.</p>
+                    <span class="concept-formula">E(x) = (ax + b) mod 26</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Hill Cipher</h4>
+                    <p class="text-gray-500 text-xs mb-2">Menggunakan perkalian matriks untuk mengenkripsi blok huruf sekaligus. Kunci berupa matriks invertibel.</p>
+                    <span class="concept-formula">C = K &times; P mod 26</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Playfair Cipher</h4>
+                    <p class="text-gray-500 text-xs mb-2">Mengenkripsi pasangan huruf (digraph) menggunakan matriks 5×5 yang dibangun dari kunci.</p>
+                    <span class="concept-formula">Matriks 5×5 dari kunci</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-5">
+            <a href="/classical" class="btn-accent-outline text-xs">Coba Sandi Klasik</a>
+            <a href="/playground" class="btn-ghost text-xs">Buka Playground</a>
+        </div>
+    </div>
+
+    <!-- ═══════════ BAB 3: KRIPTOGRAFI MODERN ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="step-number">3</span>
+            <h3 class="text-white font-bold text-base">Kriptografi Modern</h3>
+            <span class="badge-warn ml-auto">Menengah</span>
+        </div>
+        <div class="text-gray-400 text-sm leading-relaxed space-y-3">
+            <p>Kriptografi modern mengandalkan matematika kompleks dan kekuatan komputasi. Terbagi menjadi dua kategori utama:</p>
+
+            <div class="mt-4 space-y-4">
+                <div class="concept-item">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="badge-accent text-[0.6rem]">Simetris</span>
+                        <h4 class="text-white font-semibold text-sm">AES (Advanced Encryption Standard)</h4>
+                    </div>
+                    <p class="text-gray-500 text-xs mb-2">Standar enkripsi simetris yang paling banyak digunakan di dunia. Menggunakan satu kunci yang sama untuk enkripsi dan dekripsi. Beroperasi pada blok 128-bit dengan kunci 128, 192, atau 256-bit.</p>
+                    <div class="flex gap-2 flex-wrap">
+                        <span class="concept-formula">Substitusi → Permutasi → Mix → AddKey</span>
+                    </div>
+                </div>
+
+                <div class="concept-item">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="badge-accent text-[0.6rem]">Asimetris</span>
+                        <h4 class="text-white font-semibold text-sm">RSA (Rivest-Shamir-Adleman)</h4>
+                    </div>
+                    <p class="text-gray-500 text-xs mb-2">Algoritma kunci publik pertama yang praktikal. Keamanannya berdasarkan kesulitan memfaktorkan bilangan besar. Menggunakan sepasang kunci: publik (e, n) untuk enkripsi dan privat (d, n) untuk dekripsi.</p>
+                    <div class="flex gap-2 flex-wrap">
+                        <span class="concept-formula">C = M^e mod n</span>
+                        <span class="concept-formula">M = C^d mod n</span>
+                    </div>
+                </div>
+
+                <div class="concept-item">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="badge-accent text-[0.6rem]">Hash</span>
+                        <h4 class="text-white font-semibold text-sm">SHA-256</h4>
+                    </div>
+                    <p class="text-gray-500 text-xs mb-2">Fungsi hash kriptografi yang menghasilkan digest 256-bit (32 byte). Bersifat satu arah — tidak bisa dikembalikan ke input asli. Digunakan untuk verifikasi integritas data, password hashing, dan blockchain.</p>
+                    <div class="flex gap-2 flex-wrap">
+                        <span class="concept-formula">H(m) → 256-bit digest</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-5">
+            <a href="/modern" class="btn-accent-outline text-xs">Coba Kriptografi Modern</a>
+            <a href="/simulator" class="btn-ghost text-xs">Lihat Simulator RSA</a>
+        </div>
+    </div>
+
+    <!-- ═══════════ BAB 4: MATEMATIKA KRIPTOGRAFI ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="step-number">4</span>
+            <h3 class="text-white font-bold text-base">Matematika di Balik Kriptografi</h3>
+            <span class="badge-warn ml-auto">Menengah</span>
+        </div>
+        <div class="text-gray-400 text-sm leading-relaxed space-y-3">
+            <p>Kriptografi modern sangat bergantung pada teori bilangan dan aljabar. Berikut konsep matematika penting yang perlu dipahami:</p>
+
+            <div class="concept-grid mt-4">
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Aritmetika Modular</h4>
+                    <p class="text-gray-500 text-xs mb-2">Operasi pada bilangan yang "berputar" setelah mencapai modulus tertentu. Fondasi utama hampir semua algoritma kriptografi.</p>
+                    <span class="concept-formula">a mod n = sisa bagi a÷n</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">GCD & Algoritma Euclidean</h4>
+                    <p class="text-gray-500 text-xs mb-2">Menemukan faktor persekutuan terbesar (FPB) dari dua bilangan. Penting untuk menentukan apakah dua bilangan coprime.</p>
+                    <span class="concept-formula">gcd(a, b) = gcd(b, a mod b)</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Invers Modular</h4>
+                    <p class="text-gray-500 text-xs mb-2">Menemukan bilangan x dimana (a × x) mod n = 1. Digunakan dalam dekripsi RSA dan Affine cipher.</p>
+                    <span class="concept-formula">a × a⁻¹ ≡ 1 (mod n)</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Eksponensial Cepat</h4>
+                    <p class="text-gray-500 text-xs mb-2">Menghitung a^b mod n secara efisien menggunakan teknik square-and-multiply. Kunci untuk implementasi RSA.</p>
+                    <span class="concept-formula">a^b mod n (binary method)</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Bilangan Prima</h4>
+                    <p class="text-gray-500 text-xs mb-2">Bilangan yang hanya habis dibagi 1 dan dirinya sendiri. RSA bergantung pada bilangan prima besar yang sulit difaktorkan.</p>
+                    <span class="concept-formula">n = p × q (sulit difaktorkan)</span>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Fungsi Euler Totient</h4>
+                    <p class="text-gray-500 text-xs mb-2">φ(n) menghitung jumlah bilangan yang kurang dari n dan coprime dengan n. Vital dalam pembuatan kunci RSA.</p>
+                    <span class="concept-formula">φ(pq) = (p-1)(q-1)</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-5">
+            <a href="/math" class="btn-accent-outline text-xs">Coba Alat Matematika</a>
+        </div>
+    </div>
+
+    <!-- ═══════════ BAB 5: KRIPTANALISIS ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="step-number">5</span>
+            <h3 class="text-white font-bold text-base">Kriptanalisis & Serangan</h3>
+            <span class="badge-error ml-auto">Lanjutan</span>
+        </div>
+        <div class="text-gray-400 text-sm leading-relaxed space-y-3">
+            <p>Kriptanalisis adalah ilmu memecahkan sistem kriptografi. Memahami serangan membantu kita mendesain sistem yang lebih aman.</p>
+
+            <div class="concept-grid mt-4">
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Brute Force Attack</h4>
+                    <p class="text-gray-500 text-xs">Mencoba semua kemungkinan kunci secara sistematis. Efektif terhadap cipher dengan ruang kunci kecil (mis. Caesar hanya 25 kemungkinan).</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Frequency Analysis</h4>
+                    <p class="text-gray-500 text-xs">Menganalisis frekuensi kemunculan huruf dalam ciphertext. Dapat memecahkan substitusi monoalfabetik karena pola frekuensi bahasa tetap terjaga.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Known Plaintext Attack</h4>
+                    <p class="text-gray-500 text-xs">Penyerang mengetahui sebagian plaintext dan ciphertext yang berkorespondensi, lalu merekonstruksi kunci.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">RSA Weak Key Attack</h4>
+                    <p class="text-gray-500 text-xs">Jika bilangan prima p dan q terlalu kecil atau terlalu dekat, n dapat difaktorkan dan kunci privat ditemukan.</p>
+                </div>
+            </div>
+            <div class="guide-tip mt-2">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+                <p class="text-yellow-400/80 text-xs leading-relaxed"><strong>Index of Coincidence (IC):</strong> Metrik statistik yang mengukur probabilitas dua huruf acak dari teks yang sama adalah huruf yang sama. Bahasa Inggris IC ≈ 0.0667, teks acak IC ≈ 0.0385.</p>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-5">
+            <a href="/attacks" class="btn-accent-outline text-xs">Coba Lab Serangan</a>
+            <a href="/analyzer" class="btn-ghost text-xs">Buka Analyzer</a>
+        </div>
+    </div>
+
+    <!-- ═══════════ BAB 6: KEAMANAN INFORMASI ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <span class="step-number">6</span>
+            <h3 class="text-white font-bold text-base">Keamanan Informasi dalam Praktik</h3>
+            <span class="badge-error ml-auto">Lanjutan</span>
+        </div>
+        <div class="text-gray-400 text-sm leading-relaxed space-y-3">
+            <p>Kriptografi adalah bagian dari sistem keamanan informasi yang lebih besar. Berikut adalah konsep penting dalam penerapan nyata:</p>
+
+            <div class="concept-grid mt-4">
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Key Management</h4>
+                    <p class="text-gray-500 text-xs">Bagaimana kunci dihasilkan, didistribusikan, disimpan, dan dirotasi. Sering menjadi titik terlemah dalam sistem kriptografi.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Entropi & Keacakan</h4>
+                    <p class="text-gray-500 text-xs">Ukuran ketidakpastian dalam data. Kunci kriptografi membutuhkan entropi tinggi (keacakan sejati) agar aman.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Tanda Tangan Digital</h4>
+                    <p class="text-gray-500 text-xs">Menggunakan kunci privat untuk "menandatangani" pesan. Siapa pun bisa memverifikasi dengan kunci publik, tapi tidak bisa memalsukan.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">HMAC</h4>
+                    <p class="text-gray-500 text-xs">Hash-based Message Authentication Code. Menggabungkan hash function dengan kunci rahasia untuk otentikasi dan integritas pesan.</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Enkripsi File</h4>
+                    <p class="text-gray-500 text-xs">Melindungi file dengan AES-256-CBC. Password dikonversi ke kunci menggunakan PBKDF2 (Password-Based Key Derivation Function).</p>
+                </div>
+                <div class="concept-item">
+                    <h4 class="text-white font-semibold text-sm mb-1">Benchmarking</h4>
+                    <p class="text-gray-500 text-xs">Mengukur performa algoritma penting untuk memilih yang tepat. Trade-off antara keamanan dan kecepatan selalu ada.</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-5">
+            <a href="/keygen" class="btn-accent-outline text-xs">Generate Kunci</a>
+            <a href="/file-crypto" class="btn-ghost text-xs">Enkripsi File</a>
+            <a href="/benchmark" class="btn-ghost text-xs">Benchmark</a>
+        </div>
+    </div>
+
+    <!-- ═══════════ GLOSARIUM ═══════════ -->
+    <div class="card-base p-6 chapter-card">
+        <div class="flex items-center gap-3 mb-5">
+            <svg class="w-5 h-5 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+            <h3 class="text-white font-bold text-base">Glosarium Kriptografi</h3>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 text-sm">
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Plaintext</span>
+                <span class="text-gray-500 text-xs">Pesan asli sebelum dienkripsi</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Ciphertext</span>
+                <span class="text-gray-500 text-xs">Pesan yang sudah dienkripsi</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Key</span>
+                <span class="text-gray-500 text-xs">Kunci yang mengontrol proses enkripsi/dekripsi</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Hash</span>
+                <span class="text-gray-500 text-xs">Fungsi satu arah yang menghasilkan digest tetap</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Entropy</span>
+                <span class="text-gray-500 text-xs">Ukuran keacakan/ketidakpastian dalam data</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Digest</span>
+                <span class="text-gray-500 text-xs">Output tetap dari fungsi hash</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">IV</span>
+                <span class="text-gray-500 text-xs">Initialization Vector — nilai acak untuk mode operasi</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Salt</span>
+                <span class="text-gray-500 text-xs">Data acak yang ditambahkan sebelum hashing</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">PBKDF2</span>
+                <span class="text-gray-500 text-xs">Derivasi kunci dari password dengan iterasi</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Coprime</span>
+                <span class="text-gray-500 text-xs">Dua bilangan dengan GCD = 1</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Modulus</span>
+                <span class="text-gray-500 text-xs">Bilangan pembagi dalam aritmetika modular</span>
+            </div>
+            <div class="flex gap-2">
+                <span class="text-accent-light font-mono text-xs bg-accent/5 px-2 py-0.5 rounded h-fit">Totient</span>
+                <span class="text-gray-500 text-xs">φ(n) — jumlah bilangan coprime dengan n</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="card-base p-6 text-center">
+        <h3 class="text-white font-semibold mb-2">Siap untuk praktek?</h3>
+        <p class="text-gray-500 text-sm mb-4">Terapkan apa yang kamu pelajari di alat interaktif CipherLab.</p>
+        <div class="flex gap-3 justify-center flex-wrap">
+            <a href="/playground" class="btn-primary text-sm">Buka Playground</a>
+            <a href="/challenges" class="btn-accent-outline text-sm">Mulai Tantangan</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

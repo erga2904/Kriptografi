@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}Playground — CipherLab{% endblock %}
+{% block page_title %}Playground{% endblock %}
+{% block page_subtitle %}Sandbox kriptografi — jalankan semua algoritma dari satu tempat{% endblock %}
+
+{% block content %}
+<!-- Panduan -->
+<div class="guide-panel card-base mb-6 rounded-xl" id="guide-panel">
+    <button onclick="toggleGuide()" class="guide-toggle">
+        <div class="guide-icon"><svg class="w-4 h-4 text-accent-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg></div>
+        <div><span class="text-white font-semibold text-sm">Panduan & Tutorial</span><br><span class="text-gray-500 text-xs">Klik untuk melihat cara menggunakan Playground</span></div>
+        <svg class="guide-chevron w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+    </button>
+    <div class="guide-content">
+        <div class="space-y-3">
+            <div class="guide-step"><span class="step-number">1</span><div><h4 class="text-white text-sm font-medium">Pilih Algoritma</h4><p class="text-gray-500 text-xs">Pilih algoritma dari dropdown — Caesar, Vigenère, Affine, Hill, Playfair, AES, RSA, atau SHA-256.</p></div></div>
+            <div class="guide-divider"></div>
+            <div class="guide-step"><span class="step-number">2</span><div><h4 class="text-white text-sm font-medium">Atur Mode & Parameter</h4><p class="text-gray-500 text-xs">Pilih mode (Enkripsi/Dekripsi/Hash) dan isi parameter sesuai algoritma (shift, key, dsb).</p></div></div>
+            <div class="guide-divider"></div>
+            <div class="guide-step"><span class="step-number">3</span><div><h4 class="text-white text-sm font-medium">Masukkan Teks & Jalankan</h4><p class="text-gray-500 text-xs">Ketik teks input lalu klik "Jalankan". Hasil muncul di panel kanan beserta waktu eksekusi.</p></div></div>
+        </div>
+        <div class="guide-tip">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+            <p class="text-yellow-400/80 text-xs"><strong>Tips:</strong> Playground menjalankan semua algoritma dari satu tempat. Gunakan ini untuk membandingkan hasil enkripsi berbeda secara cepat. <a href="/learning" class="text-accent-light hover:underline">Baca materi &rarr;</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
+
+    <!-- Left: Input Panel -->
+    <div class="card-base p-6 space-y-5">
+        <div class="flex items-center gap-2 mb-1">
+            <div class="pulse-dot"></div>
+            <h2 class="text-white font-semibold text-sm">Input</h2>
+        </div>
+
+        <!-- Algorithm Select -->
+        <div>
+            <label class="label">Algoritma</label>
+            <select id="pg-algorithm" class="input-field" onchange="pgUpdateParams()">
+                <option value="caesar">Caesar Cipher</option>
+                <option value="vigenere">Vigenère Cipher</option>
+                <option value="affine">Affine Cipher</option>
+                <option value="playfair">Playfair Cipher</option>
+                <option value="hill">Hill Cipher</option>
+                <option value="aes">AES-128</option>
+                <option value="rsa">RSA</option>
+                <option value="sha256">SHA-256</option>
+            </select>
+        </div>
+
+        <!-- Mode -->
+        <div>
+            <label class="label">Mode</label>
+            <div class="flex gap-2">
+                <button onclick="pgSetMode('encrypt')" id="pg-mode-enc" class="cipher-tab active flex-1 text-center">Enkripsi</button>
+                <button onclick="pgSetMode('decrypt')" id="pg-mode-dec" class="cipher-tab flex-1 text-center">Dekripsi</button>
+            </div>
+        </div>
+
+        <!-- Text Input -->
+        <div>
+            <label class="label">Teks</label>
+            <textarea id="pg-text" class="input-field mono" rows="5" placeholder="Masukkan teks di sini..."></textarea>
+        </div>
+
+        <!-- Dynamic Parameters -->
+        <div id="pg-params" class="space-y-3">
+            <!-- Populated by JS -->
+        </div>
+
+        <!-- Run Button -->
+        <button id="pg-run" class="btn-primary w-full" onclick="pgRun()">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+            Jalankan
+        </button>
+    </div>
+
+    <!-- Right: Output Panel -->
+    <div class="card-base p-6 space-y-5">
+        <div class="flex items-center justify-between mb-1">
+            <h2 class="text-white font-semibold text-sm">Output</h2>
+            <div id="pg-timing" class="text-xs text-gray-500 font-mono hidden"></div>
+        </div>
+
+        <!-- Result -->
+        <div>
+            <label class="label">Hasil</label>
+            <div id="pg-result" class="code-block min-h-[120px] select-all">
+                <span class="text-gray-600 italic">Hasil akan muncul di sini...</span>
+            </div>
+        </div>
+
+        <!-- Metadata -->
+        <div id="pg-meta" class="hidden space-y-3">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="text-center p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                    <div class="text-xs text-gray-500 mb-1">Algoritma</div>
+                    <div id="pg-meta-algo" class="text-sm text-white font-medium">—</div>
+                </div>
+                <div class="text-center p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                    <div class="text-xs text-gray-500 mb-1">Waktu</div>
+                    <div id="pg-meta-time" class="text-sm text-accent-light font-mono">—</div>
+                </div>
+                <div class="text-center p-3 rounded-lg bg-surface-700/50 border border-border-subtle">
+                    <div class="text-xs text-gray-500 mb-1">Ukuran Output</div>
+                    <div id="pg-meta-size" class="text-sm text-white font-mono">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Steps (if available) -->
+        <div id="pg-steps-wrap" class="hidden">
+            <label class="label">Langkah Proses</label>
+            <div id="pg-steps" class="code-block max-h-60 overflow-y-auto text-xs"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-2">
+            <button class="btn-ghost flex-1" onclick="pgCopy()">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/></svg>
+                Salin
+            </button>
+            <button class="btn-ghost flex-1" onclick="pgClear()">Bersihkan</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let pgMode = 'encrypt';
+
+const PARAM_CONFIG = {
+    caesar: [{id:'shift', label:'Pergeseran (0-25)', type:'number', value:3, min:0, max:25}],
+    vigenere: [{id:'key', label:'Kunci', type:'text', placeholder:'masukkan kunci'}],
+    affine: [{id:'a', label:'Kunci A (koprima 26)', type:'number', value:5},{id:'b', label:'Kunci B', type:'number', value:8}],
+    playfair: [{id:'key', label:'Kunci', type:'text', placeholder:'masukkan kunci'}],
+    hill: [{id:'key_matrix', label:'Matriks Kunci (pisah koma, mis: 6,24,1,13)', type:'text', placeholder:'6,24,1,13'}],
+    aes: [{id:'key', label:'Kunci (16 karakter)', type:'text', placeholder:'kunci16karakter!'}],
+    rsa: [{id:'bits', label:'Ukuran Bit', type:'number', value:32, min:16, max:512}],
+    sha256: []
+};
+
+function pgSetMode(m) {
+    pgMode = m;
+    document.getElementById('pg-mode-enc').classList.toggle('active', m === 'encrypt');
+    document.getElementById('pg-mode-dec').classList.toggle('active', m === 'decrypt');
+}
+
+function pgUpdateParams() {
+    const algo = document.getElementById('pg-algorithm').value;
+    const container = document.getElementById('pg-params');
+    const params = PARAM_CONFIG[algo] || [];
+    container.innerHTML = params.map(p => `
+        <div>
+            <label class="label">${p.label}</label>
+            <input id="pg-param-${p.id}" type="${p.type}" class="input-field"
+                   value="${p.value || ''}" placeholder="${p.placeholder || ''}"
+                   ${p.min !== undefined ? 'min="'+p.min+'"' : ''} ${p.max !== undefined ? 'max="'+p.max+'"' : ''}>
+        </div>
+    `).join('');
+}
+
+async function pgRun() {
+    const btn = document.getElementById('pg-run');
+    btn.classList.add('loading');
+    const algo = document.getElementById('pg-algorithm').value;
+    const text = document.getElementById('pg-text').value;
+    const params = {};
+    (PARAM_CONFIG[algo] || []).forEach(p => {
+        const el = document.getElementById('pg-param-' + p.id);
+        params[p.id] = el ? (p.type === 'number' ? Number(el.value) : el.value) : '';
+    });
+    try {
+        const resp = await fetch('/api/playground/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({algorithm: algo, mode: pgMode, text, params})
+        });
+        const data = await resp.json();
+        if (data.error) {
+            document.getElementById('pg-result').innerHTML = `<span class="text-red-400">${data.error}</span>`;
+        } else {
+            document.getElementById('pg-result').textContent = data.result || '';
+            document.getElementById('pg-meta').classList.remove('hidden');
+            document.getElementById('pg-meta-algo').textContent = data.algorithm;
+            document.getElementById('pg-meta-time').textContent = data.time_ms + ' ms';
+            document.getElementById('pg-meta-size').textContent = data.output_length + ' chars';
+            document.getElementById('pg-timing').textContent = data.time_ms + ' ms';
+            document.getElementById('pg-timing').classList.remove('hidden');
+            if (data.steps && data.steps.length) {
+                document.getElementById('pg-steps-wrap').classList.remove('hidden');
+                document.getElementById('pg-steps').textContent = data.steps.join('\n');
+            } else {
+                document.getElementById('pg-steps-wrap').classList.add('hidden');
+            }
+        }
+    } catch(e) {
+        document.getElementById('pg-result').innerHTML = `<span class="text-red-400">Error: ${e.message}</span>`;
+    }
+    btn.classList.remove('loading');
+}
+
+function pgCopy() {
+    const text = document.getElementById('pg-result').textContent;
+    navigator.clipboard.writeText(text);
+}
+function pgClear() {
+    document.getElementById('pg-text').value = '';
+    document.getElementById('pg-result').innerHTML = '<span class="text-gray-600 italic">Hasil akan muncul di sini...</span>';
+    document.getElementById('pg-meta').classList.add('hidden');
+    document.getElementById('pg-steps-wrap').classList.add('hidden');
+    document.getElementById('pg-timing').classList.add('hidden');
+}
+
+pgUpdateParams();
+</script>
+{% endblock %}

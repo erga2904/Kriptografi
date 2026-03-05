@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Attack Lab — CipherLab{% endblock %}
+{% block page_title %}Attack Simulation Lab{% endblock %}
+{% block page_subtitle %}Educational cryptanalysis and attack demonstrations{% endblock %}
+
+{% block content %}
+<!-- Tabs -->
+<div class="flex gap-2 mb-6 overflow-x-auto pb-2 flex-wrap">
+    <button onclick="selectAttack('brute')" id="tab-brute" class="cipher-tab active">Brute Force Caesar</button>
+    <button onclick="selectAttack('freq')" id="tab-freq" class="cipher-tab">Frequency Analysis</button>
+    <button onclick="selectAttack('rsa-weak')" id="tab-rsa-weak" class="cipher-tab">RSA Weak Key</button>
+</div>
+
+<!-- ═══════════════ BRUTE FORCE CAESAR ═══════════════ -->
+<div id="panel-brute" class="attack-panel">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Brute Force Caesar Attack</h3>
+            <p class="text-sm text-gray-500 mb-5">Try all 26 possible shifts and rank by English frequency similarity.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Ciphertext</label>
+                    <textarea id="brute-text" class="input-field h-24 font-mono" placeholder="Khoor Zruog">Khoor Zruog</textarea>
+                </div>
+                <button onclick="runBrute()" class="btn-primary w-full">Launch Attack</button>
+            </div>
+        </div>
+        <div id="result-brute" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Attack Results</h3>
+            <div id="result-brute-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ FREQUENCY ANALYSIS ═══════════════ -->
+<div id="panel-freq" class="attack-panel hidden">
+    <div class="space-y-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">Frequency Analysis</h3>
+            <p class="text-sm text-gray-500 mb-5">Analyze letter frequency distribution and compare with English.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">Text to analyze</label>
+                    <textarea id="freq-text" class="input-field h-32" placeholder="Paste ciphertext or any text to analyze..."></textarea>
+                </div>
+                <button onclick="runFrequency()" class="btn-primary w-full">Analyze</button>
+            </div>
+        </div>
+        <div id="result-freq" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card-base p-6">
+                    <h3 class="text-white font-semibold mb-4">Frequency Chart</h3>
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="freq-chart"></canvas>
+                    </div>
+                </div>
+                <div class="card-base p-6">
+                    <h3 class="text-white font-semibold mb-4">Statistics</h3>
+                    <div id="freq-stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ RSA WEAK KEY ═══════════════ -->
+<div id="panel-rsa-weak" class="attack-panel hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card-base p-6">
+            <h3 class="text-white font-semibold mb-1">RSA Weak Key Attack</h3>
+            <p class="text-sm text-gray-500 mb-5">Attempt to factor n using trial division and Fermat's method.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="label">n (public modulus)</label>
+                    <input type="number" id="rsa-weak-n" class="input-field font-mono" placeholder="3233" value="3233">
+                </div>
+                <div>
+                    <label class="label">e (public exponent)</label>
+                    <input type="number" id="rsa-weak-e" class="input-field font-mono" value="17">
+                </div>
+                <button onclick="runRSAWeak()" class="btn-primary w-full">Launch Factoring Attack</button>
+            </div>
+        </div>
+        <div id="result-rsa-weak" class="card-base p-6 hidden">
+            <h3 class="text-white font-semibold mb-4">Attack Result</h3>
+            <div id="result-rsa-weak-content"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const ATTACKS = ['brute','freq','rsa-weak'];
+let freqChart = null;
+
+function selectAttack(name) {
+    ATTACKS.forEach(a => {
+        document.getElementById('panel-' + a).classList.toggle('hidden', a !== name);
+        document.getElementById('tab-' + a).classList.toggle('active', a === name);
+    });
+}
+
+async function runBrute() {
+    const btn = event.target; btn.classList.add('loading'); btn.disabled = true;
+    try {
+        const res = await fetch('/api/attacks/brute-caesar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: document.getElementById('brute-text').value })
+        });
+        const data = await res.json();
+        const el = document.getElementById('result-brute-content');
+
+        let html = `<div class="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+            <div class="text-xs text-green-400 mb-1">Best Guess (shift = ${data.best_guess.shift})</div>
+            <div class="font-mono text-green-300">${escapeHtml(data.best_guess.decrypted)}</div>
+        </div>`;
+
+        html += `<div class="space-y-1.5 max-h-72 overflow-y-auto pr-2">`;
+        data.all_results.forEach((r, i) => {
+            const isBest = i === 0;
+            html += `<div class="flex items-center gap-3 text-xs font-mono p-2 rounded ${isBest ? 'bg-accent/10 border border-accent/20' : 'bg-surface-900 border border-border-subtle'}">
+                <span class="text-gray-500 w-12 flex-shrink-0">k=${String(r.shift).padStart(2, '0')}</span>
+                <span class="text-gray-300 flex-1 truncate">${escapeHtml(r.decrypted)}</span>
+                <span class="text-gray-500 flex-shrink-0">${r.score}</span>
+            </div>`;
+        });
+        html += `</div>`;
+
+        el.innerHTML = html;
+        document.getElementById('result-brute').classList.remove('hidden');
+        document.getElementById('result-brute').classList.add('animate-slide-up');
+    } finally { btn.classList.remove('loading'); btn.disabled = false; }
+}
+
+async function runFrequency() {
+    const btn = event.target; btn.classList.add('loading'); btn.disabled = true;
+    try {
+        const res = await fetch('/api/attacks/frequency', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: document.getElementById('freq-text').value })
+        });
+        const data = await res.json();
+        if (data.error) {
+            document.getElementById('freq-stats').innerHTML = `<div class="text-red-400 text-sm">${data.error}</div>`;
+            return;
+        }
+
+        // Render chart
+        if (freqChart) freqChart.destroy();
+        const ctx = document.getElementById('freq-chart').getContext('2d');
+        freqChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.chart_data.labels,
+                datasets: [
+                    {
+                        label: 'Observed %',
+                        data: data.chart_data.observed,
+                        backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Expected English %',
+                        data: data.chart_data.expected,
+                        backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                        borderColor: 'rgba(148, 163, 184, 0.5)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#94A3B8', font: { family: 'Inter', size: 11 } }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#64748B', font: { family: 'JetBrains Mono', size: 10 } },
+                        grid: { color: 'rgba(148,163,184,0.05)' }
+                    },
+                    y: {
+                        ticks: { color: '#64748B', font: { size: 10 } },
+                        grid: { color: 'rgba(148,163,184,0.05)' }
+                    }
+                }
+            }
+        });
+
+        // Stats
+        const stats = document.getElementById('freq-stats');
+        stats.innerHTML = `
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-surface-900 p-3 rounded border border-border-subtle">
+                        <div class="text-xs text-gray-500">Total Letters</div>
+                        <div class="text-lg font-bold text-white font-mono">${data.total_letters}</div>
+                    </div>
+                    <div class="bg-surface-900 p-3 rounded border border-border-subtle">
+                        <div class="text-xs text-gray-500">χ² Score</div>
+                        <div class="text-lg font-bold text-white font-mono">${data.chi_squared}</div>
+                    </div>
+                    <div class="bg-surface-900 p-3 rounded border border-border-subtle">
+                        <div class="text-xs text-gray-500">IC (observed)</div>
+                        <div class="text-lg font-bold text-accent-light font-mono">${data.index_of_coincidence}</div>
+                    </div>
+                    <div class="bg-surface-900 p-3 rounded border border-border-subtle">
+                        <div class="text-xs text-gray-500">IC (English)</div>
+                        <div class="text-lg font-bold text-gray-400 font-mono">${data.expected_english_ic}</div>
+                    </div>
+                </div>
+                <div>
+                    <span class="label">Top 5 Letters</span>
+                    <div class="flex gap-2 mt-1.5">
+                        ${data.sorted_frequencies.slice(0, 5).map(f =>
+                            `<div class="bg-surface-900 px-3 py-2 rounded border border-border-subtle text-center">
+                                <div class="font-mono text-accent-light text-lg">${f.letter}</div>
+                                <div class="text-xs text-gray-500">${f.percentage}%</div>
+                            </div>`
+                        ).join('')}
+                    </div>
+                </div>
+            </div>`;
+
+        document.getElementById('result-freq').classList.remove('hidden');
+        document.getElementById('result-freq').classList.add('animate-slide-up');
+    } finally { btn.classList.remove('loading'); btn.disabled = false; }
+}
+
+async function runRSAWeak() {
+    const btn = event.target; btn.classList.add('loading'); btn.disabled = true;
+    try {
+        const res = await fetch('/api/attacks/rsa-weak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                n: parseInt(document.getElementById('rsa-weak-n').value),
+                e: parseInt(document.getElementById('rsa-weak-e').value)
+            })
+        });
+        const data = await res.json();
+        const el = document.getElementById('result-rsa-weak-content');
+
+        let html = '';
+        if (data.attack_successful) {
+            html += `<div class="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <div class="text-xs text-red-400 mb-2">⚠ Key Successfully Broken</div>
+                <div class="text-sm text-red-300">Method: ${data.method}</div>
+            </div>`;
+            html += `<div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
+                    <div class="text-xs text-gray-500">p</div><div class="font-mono text-white">${data.p}</div>
+                </div>
+                <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
+                    <div class="text-xs text-gray-500">q</div><div class="font-mono text-white">${data.q}</div>
+                </div>
+                <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
+                    <div class="text-xs text-gray-500">φ(n)</div><div class="font-mono text-white">${data.phi_n}</div>
+                </div>
+                <div class="bg-surface-900 p-3 rounded border border-border-subtle text-center">
+                    <div class="text-xs text-gray-500">d (private key)</div><div class="font-mono text-red-400">${data.private_key_d}</div>
+                </div>
+            </div>`;
+            if (data.math) {
+                html += `<div class="font-mono text-xs text-gray-300 bg-surface-900 p-3 rounded border border-border-subtle">${escapeHtml(data.math)}</div>`;
+            }
+        } else {
+            html += `<div class="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                <div class="text-sm text-green-300">${data.message || 'Key appears strong.'}</div>
+            </div>`;
+        }
+
+        // Steps
+        if (data.steps) {
+            html += `<details class="mt-4"><summary class="cursor-pointer text-sm text-gray-400 hover:text-gray-200 transition-colors select-none">Show attack log</summary><div class="mt-3 space-y-2 max-h-64 overflow-y-auto pr-2">`;
+            data.steps.forEach(s => {
+                html += `<div class="text-xs font-mono bg-surface-900 p-2.5 rounded border border-border-subtle">
+                    <span class="text-gray-500">${s.method}:</span> <span class="${s.status === 'SUCCESS' ? 'text-red-400' : 'text-gray-300'}">${s.status}</span></div>`;
+            });
+            html += `</div></details>`;
+        }
+
+        el.innerHTML = html;
+        document.getElementById('result-rsa-weak').classList.remove('hidden');
+        document.getElementById('result-rsa-weak').classList.add('animate-slide-up');
+    } finally { btn.classList.remove('loading'); btn.disabled = false; }
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+</script>
+{% endblock %}
