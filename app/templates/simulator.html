@@ -54,12 +54,17 @@
 
             <div id="sim-auto-fields" class="hidden">
                 <label class="label">Ukuran Bit</label>
-                <select id="sim-bits" class="input-field">
-                    <option value="16">16-bit (cepat)</option>
-                    <option value="32" selected>32-bit</option>
-                    <option value="64">64-bit</option>
-                    <option value="128">128-bit</option>
-                </select>
+                <div class="custom-select-wrapper">
+                    <select id="sim-bits" class="custom-select">
+                        <option value="16">16-bit (cepat)</option>
+                        <option value="32" selected>32-bit (demo)</option>
+                        <option value="64">64-bit</option>
+                        <option value="128">128-bit</option>
+                        <option value="256">256-bit</option>
+                        <option value="512">512-bit (lambat)</option>
+                        <option value="1024">1024-bit (sangat lambat)</option>
+                    </select>
+                </div>
             </div>
 
             <button class="btn-primary w-full" onclick="simGenerate()">
