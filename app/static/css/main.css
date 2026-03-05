@@ -254,6 +254,142 @@ select.input-field {
     padding-right: 2.5rem;
 }
 
+/* Custom Dropdown / Select Styling */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 2.75rem;
+    background: rgba(11, 17, 32, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: var(--radius-md);
+    color: #e2e8f0;
+    font-size: 0.875rem;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s var(--ease);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-select:hover {
+    border-color: rgba(148, 163, 184, 0.2);
+    background: rgba(11, 17, 32, 0.85);
+}
+
+.custom-select:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: rgba(11, 17, 32, 0.9);
+}
+
+/* Custom arrow icon */
+.custom-select-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #94A3B8;
+    pointer-events: none;
+    transition: all 0.25s var(--ease);
+}
+
+.custom-select:focus + .custom-select-wrapper::after,
+.custom-select-wrapper:has(.custom-select:focus)::after {
+    border-top-color: var(--accent-light);
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Custom select options styling */
+.custom-select option {
+    background: var(--surface-800);
+    color: #e2e8f0;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.custom-select option:hover,
+.custom-select option:checked {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent-light);
+}
+
+.custom-select option:disabled {
+    color: #64748B;
+    background: var(--surface-900);
+}
+
+/* Variant: Small dropdown */
+.custom-select.select-sm {
+    padding: 0.5rem 0.75rem;
+    padding-right: 2.25rem;
+    font-size: 0.8125rem;
+}
+
+.custom-select-wrapper:has(.select-sm)::after {
+    right: 0.75rem;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    border-top-width: 5px;
+}
+
+/* Variant: Large dropdown */
+.custom-select.select-lg {
+    padding: 1rem 1.25rem;
+    padding-right: 3rem;
+    font-size: 1rem;
+}
+
+.custom-select-wrapper:has(.select-lg)::after {
+    right: 1.25rem;
+    border-left-width: 6px;
+    border-right-width: 6px;
+    border-top-width: 7px;
+}
+
+/* Variant: Accent dropdown */
+.custom-select.select-accent {
+    border-color: rgba(99, 102, 241, 0.25);
+    background: rgba(99, 102, 241, 0.06);
+}
+
+.custom-select.select-accent:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.custom-select.select-accent:focus {
+    border-color: rgba(99, 102, 241, 0.6);
+    background: rgba(99, 102, 241, 0.12);
+}
+
+/* Disabled state */
+.custom-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(11, 17, 32, 0.4);
+}
+
+.custom-select-wrapper:has(.custom-select:disabled)::after {
+    opacity: 0.5;
+}
+
 /* ═══════════════ TABS ═══════════════ */
 .cipher-tab {
     padding: 0.5rem 1rem;
@@ -779,6 +915,11 @@ details[open] > summary::before {
         font-weight: 600;
     }
     
+    /* Sidebar toggle integrated in header */
+    #sidebar-toggle {
+        display: inline-flex;
+    }
+    
     /* Cards and containers */
     .card-base {
         border-radius: 12px;
@@ -894,18 +1035,12 @@ details[open] > summary::before {
         margin: 0.5rem 0 0.25rem 0;
     }
     
-    /* Top padding for main content when sidebar toggle exists */
-    #main-content {
-        padding-top: 0;
-    }
-    
+    /* Sidebar toggle is now integrated in header - remove fixed positioning */
     #sidebar-toggle {
-        top: 0.5rem;
-        left: 0.5rem;
-        width: 44px;
-        height: 44px;
-        padding: 0.625rem;
-        bottom: auto;
+        position: static;
+        width: auto;
+        height: auto;
+        padding: 0.5rem;
     }
     
     #sidebar-toggle svg {
