@@ -1,5 +1,5 @@
 /*
- * CipherLab v2.0 — Main Stylesheet
+ * CipherLab v2.1 — Main Stylesheet
  * Dark Navy + Indigo/Violet Accent · Glassmorphism · Minimalist SaaS
  * Font: Inter · WCAG Accessible
  */
@@ -617,21 +617,39 @@ select.input-field option:disabled {
 }
 
 .badge-success {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 6px;
     color: #34D399;
     background: rgba(52, 211, 153, 0.1);
-    border-color: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.15);
 }
 
 .badge-warn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 6px;
     color: #FBBF24;
     background: rgba(251, 191, 36, 0.1);
-    border-color: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.15);
 }
 
 .badge-error {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 6px;
     color: #F87171;
     background: rgba(248, 113, 113, 0.1);
-    border-color: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.15);
 }
 
 /* ═══════════════ ACTIVE NAV ═══════════════ */
