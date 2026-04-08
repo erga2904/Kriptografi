@@ -151,9 +151,15 @@ function fcTogglePw() {
 }
 
 async function fcProcess() {
-    if (!fcSelectedFile) return alert('Pilih file terlebih dahulu');
+    if (!fcSelectedFile) {
+        showWarn('Pilih file terlebih dahulu');
+        return;
+    }
     const pw = document.getElementById('fc-password').value;
-    if (!pw) return alert('Masukkan password');
+    if (!pw) {
+        showWarn('Masukkan password');
+        return;
+    }
 
     const btn = document.getElementById('fc-process');
     btn.classList.add('loading');
