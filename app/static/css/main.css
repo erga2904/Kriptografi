@@ -392,25 +392,33 @@ body {
     padding: 1px;
     border-radius: var(--radius-md);
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
 }
 
 .input-glow-wrap::before {
     content: '';
     position: absolute;
-    inset: -350%;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
     background: conic-gradient(
-        from 0deg,
-        transparent 45%,
-        rgba(99, 102, 241, 0.95) 50%,
-        rgba(129, 140, 248, 1) 52%,
-        transparent 57%
+        from 0deg at 50% 50%,
+        rgba(99, 102, 241, 0) 0deg,
+        rgba(99, 102, 241, 0) 48deg,
+        rgba(99, 102, 241, 0.9) 74deg,
+        rgba(129, 140, 248, 1) 98deg,
+        rgba(99, 102, 241, 0) 132deg,
+        rgba(99, 102, 241, 0) 360deg
     );
     opacity: 0;
     transition: opacity 0.38s ease;
     animation: input-border-spin 6s linear infinite;
     z-index: 0;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
 }
 
 .input-glow-wrap:focus-within::before {
@@ -427,6 +435,7 @@ body {
     z-index: 1;
     margin: 0;
     border: none;
+    border-radius: calc(var(--radius-md) - 1px);
     background: rgba(8, 13, 26, 0.76);
 }
 
@@ -858,6 +867,20 @@ select.input-field option:disabled {
     line-height: 1.15rem;
     color: #e2e8f0;
     word-break: break-word;
+}
+
+@media (max-width: 640px) {
+    .app-toast-container {
+        left: 0.75rem;
+        right: 0.75rem;
+        top: 0.75rem;
+    }
+
+    .app-toast {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
 }
 
 /* ═══════════════ LIQUID RIPPLE ═══════════════ */
