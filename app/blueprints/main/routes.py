@@ -8,10 +8,15 @@ main_bp = Blueprint("main", __name__)
 
 
 # ── Core Pages ───────────────────────────────────────────────────
+from jinja2 import TemplateNotFound
 @main_bp.route("/")
 def index():
     return render_template("index.html")
-
+    try:
+        return render_template("encryption_table.html")
+    except TemplateNotFound:
+        # Keep endpoint alive if deployment bundle misses the new template.
+        return render_template("index.html")
 
 @main_bp.route("/classical")
 def classical():
