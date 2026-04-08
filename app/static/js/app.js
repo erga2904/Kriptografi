@@ -5,6 +5,40 @@
 (function () {
     'use strict';
 
+    function ensureToastContainer() {
+        let container = document.getElementById('app-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'app-toast-container';
+            container.className = 'app-toast-container';
+            container.setAttribute('aria-live', 'polite');
+            container.setAttribute('aria-atomic', 'true');
+            document.body.appendChild(container);
+        }
+        return container;
+    }
+
+    function getToastIcon(type) {
+        if (type === 'success') return 'M5 13l4 4L19 7';
+        if (type === 'error') return 'M12 9v2m0 4h.01m-.01-12a9 9 0 100 18 9 9 0 000-18z';
+        if (type === 'warn') return 'M12 9v3.75m0 3.75h.007v.008H12v-.008zM10.29 3.86L1.82 18a2 2 0 001.72 3h16.92a2 2 0 001.72-3L13.71 3.86a2 2 0 00-3.42 0z';
+        return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+    }
+
+    function initAnimatedInputBorders() {
+        const fields = document.querySelectorAll('input.input-field, textarea.input-field, select.input-field');
+        fields.forEach((field) => {
+            if (!field.parentElement || field.parentElement.classList.contains('input-glow-wrap')) {
+                return;
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'input-glow-wrap';
+            field.parentElement.insertBefore(wrapper, field);
+            wrapper.appendChild(field);
+        });
+    }
+
     // ═══════════════ MOBILE SIDEBAR TOGGLE ═══════════════
     function initSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -106,21 +140,29 @@
 
     // ═══════════════ TOAST NOTIFICATIONS ═══════════════
     window.showToast = function (message, type = 'info') {
+        const normalizedType = ['info', 'success', 'error', 'warn'].includes(type) ? type : 'info';
+        const container = ensureToastContainer();
         const toast = document.createElement('div');
-        toast.className = `fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-[9999] px-4 py-2.5 rounded-lg text-sm font-medium shadow-lg animate-slide-up max-w-xs`;
-        toast.style.background = type === 'error' ? '#991B1B' : type === 'success' ? '#065F46' : '#0F1729';
-        toast.style.color = type === 'error' ? '#FCA5A5' : type === 'success' ? '#86EFAC' : '#E2E8F0';
-        toast.style.border = `1px solid ${type === 'error' ? 'rgba(239,68,68,0.2)' : type === 'success' ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.15)'}`;
-        toast.style.backdropFilter = 'blur(12px)';
-        toast.style.wordWrap = 'break-word';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        
+        toast.className = `app-toast ${normalizedType}`;
+        toast.innerHTML = `
+            <div class="app-toast-icon" aria-hidden="true">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="${getToastIcon(normalizedType)}"/>
+                </svg>
+            </div>
+            <div class="app-toast-message">${message}</div>
+        `;
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+
         setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s';
-            setTimeout(() => toast.remove(), 300);
-        }, 2500);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 240);
+        }, 2600);
+    };
+
+    window.showWarn = function (message) {
+        window.showToast(message, 'warn');
     };
 
     // ═══════════════ GLOBAL FETCH ERROR HANDLER ═══════════════
@@ -141,5 +183,11 @@
             }
         }
     };
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAnimatedInputBorders);
+    } else {
+        initAnimatedInputBorders();
+    }
 
 })();
