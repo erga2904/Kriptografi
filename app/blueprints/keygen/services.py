@@ -71,17 +71,14 @@ def generate_rsa_keypair(bits: int = 512) -> dict:
     return {
         "type": "RSA",
         "bits": actual_bits,
+        "e": e,
+        "n": str(n),
+        "d": str(d),
+        "p": str(p),
+        "q": str(q),
+        "phi_n": str(phi_n),
         "public_key": {"e": e, "n": str(n)},
-        "private_key": {"d": str(d), "n": str(n)},
-        "parameters": {
-            "p": str(p), "q": str(q),
-            "phi_n": str(phi_n),
-            "bit_length": actual_bits
-        },
-        "format": {
-            "public": f"RSA Public Key (e={e}, n={n})",
-            "private": f"RSA Private Key (d={d}, n={n})"
-        }
+        "private_key": {"d": str(d), "n": str(n)}
     }
 
 
@@ -102,39 +99,43 @@ def generate_aes_key(bits: int = 256) -> dict:
     return {
         "type": "AES",
         "bits": bits,
+        "bytes": bits // 8,
+        "hex": key_bytes.hex(),
+        "base64": __import__('base64').b64encode(key_bytes).decode(),
         "key_hex": key_bytes.hex(),
         "key_base64": __import__('base64').b64encode(key_bytes).decode(),
         "iv_hex": iv_bytes.hex(),
-        "iv_base64": __import__('base64').b64encode(iv_bytes).decode(),
-        "format": {
-            "hex": key_bytes.hex(),
-            "base64": __import__('base64').b64encode(key_bytes).decode()
-        }
+        "iv_base64": __import__('base64').b64encode(iv_bytes).decode()
     }
 
 
 def generate_random_key(length: int = 32, charset: str = "all") -> dict:
     """Generate random cryptographic key/password."""
     length = max(8, min(length, 256))
+    symbol_space = 0
 
     if charset == "hex":
         chars = string.hexdigits[:16]
         key = ''.join(secrets.choice(chars) for _ in range(length))
+        symbol_space = len(chars)
     elif charset == "alphanumeric":
         chars = string.ascii_letters + string.digits
         key = ''.join(secrets.choice(chars) for _ in range(length))
+        symbol_space = len(chars)
     elif charset == "alphabetic":
         chars = string.ascii_letters
         key = ''.join(secrets.choice(chars) for _ in range(length))
+        symbol_space = len(chars)
     elif charset == "numeric":
         key = ''.join(str(secrets.randbelow(10)) for _ in range(length))
+        symbol_space = 10
     else:  # all
         chars = string.ascii_letters + string.digits + "!@#$%^&*()-_=+[]{}|;:,.<>?"
         key = ''.join(secrets.choice(chars) for _ in range(length))
+        symbol_space = len(chars)
 
     # Calculate entropy
-    unique_chars = len(set(key))
-    entropy_per_char = math.log2(len(chars)) if charset != "numeric" else math.log2(10)
+    entropy_per_char = math.log2(symbol_space)
     total_entropy = round(entropy_per_char * length, 1)
 
     key_bytes = key.encode('utf-8')
@@ -162,6 +163,9 @@ def generate_hmac_key(bits: int = 256) -> dict:
     return {
         "type": "HMAC",
         "bits": bits,
+        "bytes": bits // 8,
+        "hex": key_bytes.hex(),
+        "base64": __import__('base64').b64encode(key_bytes).decode(),
         "key_hex": key_bytes.hex(),
         "key_base64": __import__('base64').b64encode(key_bytes).decode(),
         "length_bytes": bits // 8,
