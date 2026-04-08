@@ -1,5 +1,5 @@
 """
-CipherLab Application Factory — v2.2
+CipherLab Application Factory — v2.4
 """
 import os
 from flask import Flask
