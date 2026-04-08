@@ -118,6 +118,11 @@ VIGENERE_KEYS_SHORT = ["KEY", "SUN", "CAT", "DOG", "RAT", "OWL", "BIG", "RED"]
 VIGENERE_KEYS_LONG = ["SECRET", "CIPHER", "CASTLE", "DRAGON", "KNIGHT", "SHIELD"]
 
 
+def _normalize_answer(text: str) -> str:
+    """Normalize user answer to make checks robust to case/spacing variance."""
+    return " ".join(str(text).strip().upper().split())
+
+
 def generate_challenge(challenge_id: str | None = None) -> tuple[dict, str]:
     """Generate a specific or random challenge instance."""
     if challenge_id and challenge_id in CHALLENGES:
@@ -132,7 +137,10 @@ def generate_challenge(challenge_id: str | None = None) -> tuple[dict, str]:
         shift = random.randint(1, 25)
         result = caesar_encrypt(plaintext, shift)
         challenge["ciphertext"] = result["output"]
-        challenge["answer"] = plaintext
+        if challenge.get("type") == "temukan_kunci":
+            challenge["answer"] = str(shift)
+        else:
+            challenge["answer"] = plaintext
         challenge["_key"] = shift
         challenge["hints"] = [h.format(shift=shift) for h in challenge["hints"]]
         if "{plain_hint}" in challenge.get("description", ""):
@@ -201,29 +209,27 @@ def generate_challenge(challenge_id: str | None = None) -> tuple[dict, str]:
     token = hashlib.md5(f"{challenge['id']}:{challenge.get('ciphertext','')}:{time.time()}".encode()).hexdigest()[:12]
     challenge["token"] = token
 
+    expected_answer = _normalize_answer(challenge.get("answer", ""))
+
     # Remove internal answer from response
     safe_challenge = {k: v for k, v in challenge.items() if k != "answer" and k != "_key"}
-    safe_challenge["_answer_hash"] = hashlib.sha256(plaintext.encode()).hexdigest()
+    safe_challenge["answer_hash"] = hashlib.sha256(expected_answer.encode()).hexdigest()
 
     return safe_challenge, plaintext
 
 
-def check_answer(user_answer: str, correct_answer: str) -> dict:
-    """Check if user's answer matches."""
-    user_clean = user_answer.strip().upper().replace("  ", " ")
-    correct_clean = correct_answer.strip().upper()
+def check_answer(user_answer: str, correct_answer_hash: str) -> dict:
+    """Check if user's answer matches by comparing hash."""
+    user_clean = _normalize_answer(user_answer)
+    user_hash = hashlib.sha256(user_clean.encode()).hexdigest()
 
-    exact_match = user_clean == correct_clean
-    partial = correct_clean.startswith(user_clean) or user_clean.startswith(correct_clean)
-    similarity = _similarity(user_clean, correct_clean)
+    exact_match = user_hash == correct_answer_hash
 
+    # For feedback, we can't compute similarity from hash, so just return match status
     return {
         "correct": exact_match,
-        "partial_match": partial and not exact_match,
-        "similarity": round(similarity * 100, 1),
-        "feedback": "Benar! 🎉" if exact_match else
-                   "Hampir benar! Periksa kembali." if similarity > 0.8 else
-                   "Belum tepat. Coba lagi!"
+        "similarity": 1.0 if exact_match else 0.0,
+        "feedback": "Benar! 🎉" if exact_match else "Belum tepat. Coba lagi!"
     }
 
 
