@@ -395,30 +395,36 @@ body {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.06);
     transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+    isolation: isolate;
 }
 
 .input-glow-wrap::before {
     content: '';
     position: absolute;
-    inset: 0;
-    padding: 1px;
-    border-radius: inherit;
+    inset: -140%;
     background: conic-gradient(
         from 0deg at 50% 50%,
         rgba(99, 102, 241, 0) 0deg,
-        rgba(99, 102, 241, 0) 48deg,
-        rgba(99, 102, 241, 0.9) 74deg,
-        rgba(129, 140, 248, 1) 98deg,
-        rgba(99, 102, 241, 0) 132deg,
+        rgba(99, 102, 241, 0) 46deg,
+        rgba(99, 102, 241, 0.75) 68deg,
+        rgba(129, 140, 248, 0.95) 90deg,
+        rgba(99, 102, 241, 0.75) 112deg,
+        rgba(99, 102, 241, 0) 136deg,
         rgba(99, 102, 241, 0) 360deg
     );
     opacity: 0;
     transition: opacity 0.38s ease;
     animation: input-border-spin 6s linear infinite;
     z-index: 0;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+}
+
+.input-glow-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: calc(var(--radius-md) - 1px);
+    background: rgba(8, 13, 26, 0.84);
+    z-index: 1;
 }
 
 .input-glow-wrap:focus-within::before {
@@ -432,11 +438,11 @@ body {
 
 .input-glow-wrap > .input-field {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     margin: 0;
     border: none;
     border-radius: calc(var(--radius-md) - 1px);
-    background: rgba(8, 13, 26, 0.76);
+    background: transparent;
 }
 
 .input-glow-wrap > .input-field:focus {
