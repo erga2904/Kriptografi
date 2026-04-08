@@ -255,7 +255,7 @@
                 </button>
                 
                 <div class="min-w-0 flex-1">
-                    <h1 class="text-base sm:text-lg font-semibold text-white truncate">{% block page_title %}Dasbor{% endblock %}</h1>
+                    <h1 class="page-title-animated text-base sm:text-lg font-semibold text-white truncate">{% block page_title %}Dasbor{% endblock %}</h1>
                     <p class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{% block page_subtitle %}Platform Pembelajaran Kriptografi{% endblock %}</p>
                 </div>
                 
@@ -272,6 +272,8 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
+    <div id="app-toast-container" class="app-toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Core JS -->
     <script src="{{ url_for('static', filename='js/cursor.js') }}"></script>
