@@ -95,6 +95,11 @@ def codegen():
     return render_template("codegen.html")
 
 
+@main_bp.route("/encryption-table")
+def encryption_table():
+    return render_template("encryption_table.html")
+
+
 @main_bp.route("/learning")
 def learning():
     return render_template("learning.html")
