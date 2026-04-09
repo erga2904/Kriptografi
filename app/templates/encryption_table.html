@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Tabel Enkripsi — CipherLab{% endblock %}
+{% block page_title %}Tabel Enkripsi{% endblock %}
+{% block page_subtitle %}Referensi cepat algoritma enkripsi dan propertinya{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Filter / Search -->
+    <div class="card-base p-4 flex flex-col sm:flex-row gap-3">
+        <input type="text" id="search-input" class="input-field flex-1" placeholder="Cari algoritma...">
+        <select id="category-filter" class="input-field sm:w-48">
+            <option value="">Semua Kategori</option>
+            <option value="Klasik">Klasik</option>
+            <option value="Simetris">Simetris</option>
+            <option value="Asimetris">Asimetris</option>
+            <option value="Hash">Hash</option>
+        </select>
+    </div>
+
+    <!-- Table -->
+    <div class="card-base overflow-x-auto">
+        <table class="w-full text-sm" id="cipher-table">
+            <thead>
+                <tr class="border-b border-border-subtle text-left text-gray-400">
+                    <th class="px-4 py-3 font-medium">Algoritma</th>
+                    <th class="px-4 py-3 font-medium">Kategori</th>
+                    <th class="px-4 py-3 font-medium">Ukuran Kunci</th>
+                    <th class="px-4 py-3 font-medium">Ukuran Blok</th>
+                    <th class="px-4 py-3 font-medium">Rumus / Catatan</th>
+                    <th class="px-4 py-3 font-medium">Keamanan</th>
+                </tr>
+            </thead>
+            <tbody id="table-body" class="divide-y divide-border-subtle">
+            </tbody>
+        </table>
+        <p id="no-results" class="hidden text-center text-gray-500 py-10">Tidak ada hasil yang cocok.</p>
+    </div>
+</div>
+
+<script>
+const ciphers = [
+    {
+        name: "Caesar",
+        category: "Klasik",
+        keySize: "5 bit (shift 0–25)",
+        blockSize: "1 karakter",
+        notes: "E(x) = (x + k) mod 26",
+        security: "Sangat Lemah",
+        securityClass: "text-red-400"
+    },
+    {
+        name: "Vigenère",
+        category: "Klasik",
+        keySize: "Variabel",
+        blockSize: "1 karakter",
+        notes: "E(pᵢ) = (pᵢ + kᵢ) mod 26",
+        security: "Lemah",
+        securityClass: "text-orange-400"
+    },
+    {
+        name: "Affine",
+        category: "Klasik",
+        keySize: "~10 bit (a,b)",
+        blockSize: "1 karakter",
+        notes: "E(x) = (ax + b) mod 26, gcd(a,26)=1",
+        security: "Sangat Lemah",
+        securityClass: "text-red-400"
+    },
+    {
+        name: "Hill",
+        category: "Klasik",
+        keySize: "Variabel (matriks n×n)",
+        blockSize: "n karakter",
+        notes: "C = K · P mod 26",
+        security: "Lemah",
+        securityClass: "text-orange-400"
+    },
+    {
+        name: "Playfair",
+        category: "Klasik",
+        keySize: "Variabel (kata kunci)",
+        blockSize: "2 karakter (digraf)",
+        notes: "Substitusi digraf, matriks 5×5",
+        security: "Lemah",
+        securityClass: "text-orange-400"
+    },
+    {
+        name: "DES",
+        category: "Simetris",
+        keySize: "56 bit",
+        blockSize: "64 bit",
+        notes: "16 putaran jaringan Feistel",
+        security: "Usang",
+        securityClass: "text-red-400"
+    },
+    {
+        name: "3DES (Triple DES)",
+        category: "Simetris",
+        keySize: "112 / 168 bit",
+        blockSize: "64 bit",
+        notes: "C = E_k3(D_k2(E_k1(P)))",
+        security: "Lemah",
+        securityClass: "text-orange-400"
+    },
+    {
+        name: "AES-128",
+        category: "Simetris",
+        keySize: "128 bit",
+        blockSize: "128 bit",
+        notes: "10 putaran SubBytes/ShiftRows/MixColumns/AddRoundKey",
+        security: "Kuat",
+        securityClass: "text-green-400"
+    },
+    {
+        name: "AES-192",
+        category: "Simetris",
+        keySize: "192 bit",
+        blockSize: "128 bit",
+        notes: "12 putaran",
+        security: "Sangat Kuat",
+        securityClass: "text-emerald-400"
+    },
+    {
+        name: "AES-256",
+        category: "Simetris",
+        keySize: "256 bit",
+        blockSize: "128 bit",
+        notes: "14 putaran",
+        security: "Sangat Kuat",
+        securityClass: "text-emerald-400"
+    },
+    {
+        name: "ChaCha20",
+        category: "Simetris",
+        keySize: "256 bit",
+        blockSize: "Stream",
+        notes: "Sandi aliran berbasis ARX",
+        security: "Sangat Kuat",
+        securityClass: "text-emerald-400"
+    },
+    {
+        name: "RSA",
+        category: "Asimetris",
+        keySize: "≥2048 bit",
+        blockSize: "Variabel",
+        notes: "C = Mᵉ mod n, M = Cᵈ mod n",
+        security: "Kuat (≥2048 bit)",
+        securityClass: "text-green-400"
+    },
+    {
+        name: "ECC (Elliptic Curve)",
+        category: "Asimetris",
+        keySize: "256 bit ≈ RSA-3072",
+        blockSize: "Variabel",
+        notes: "Aritmatika titik pada kurva eliptik",
+        security: "Sangat Kuat",
+        securityClass: "text-emerald-400"
+    },
+    {
+        name: "MD5",
+        category: "Hash",
+        keySize: "—",
+        blockSize: "512 bit (output 128 bit)",
+        notes: "Tidak cocok untuk keamanan kriptografi",
+        security: "Rusak",
+        securityClass: "text-red-400"
+    },
+    {
+        name: "SHA-1",
+        category: "Hash",
+        keySize: "—",
+        blockSize: "512 bit (output 160 bit)",
+        notes: "Rentan terhadap collision attacks",
+        security: "Usang",
+        securityClass: "text-red-400"
+    },
+    {
+        name: "SHA-256",
+        category: "Hash",
+        keySize: "—",
+        blockSize: "512 bit (output 256 bit)",
+        notes: "SHA-2 family, konstruksi Merkle–Damgård",
+        security: "Kuat",
+        securityClass: "text-green-400"
+    },
+    {
+        name: "SHA-3 (Keccak)",
+        category: "Hash",
+        keySize: "—",
+        blockSize: "Variabel (output 224–512 bit)",
+        notes: "Konstruksi sponge",
+        security: "Sangat Kuat",
+        securityClass: "text-emerald-400"
+    }
+];
+
+function renderTable(data) {
+    const tbody = document.getElementById('table-body');
+    const noResults = document.getElementById('no-results');
+
+    if (data.length === 0) {
+        tbody.innerHTML = '';
+        noResults.classList.remove('hidden');
+        return;
+    }
+
+    noResults.classList.add('hidden');
+    tbody.innerHTML = data.map(c => `
+        <tr class="hover:bg-surface-700 transition-colors">
+            <td class="px-4 py-3 font-medium text-white">${escapeHtml(c.name)}</td>
+            <td class="px-4 py-3">
+                <span class="px-2 py-0.5 rounded-full text-xs bg-surface-600 text-gray-300">${escapeHtml(c.category)}</span>
+            </td>
+            <td class="px-4 py-3 font-mono text-gray-300">${escapeHtml(c.keySize)}</td>
+            <td class="px-4 py-3 font-mono text-gray-300">${escapeHtml(c.blockSize)}</td>
+            <td class="px-4 py-3 text-gray-400 text-xs">${escapeHtml(c.notes)}</td>
+            <td class="px-4 py-3 font-medium ${c.securityClass}">${escapeHtml(c.security)}</td>
+        </tr>
+    `).join('');
+}
+
+function filterTable() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const category = document.getElementById('category-filter').value;
+
+    const filtered = ciphers.filter(c => {
+        const matchSearch = !search ||
+            c.name.toLowerCase().includes(search) ||
+            c.notes.toLowerCase().includes(search);
+        const matchCategory = !category || c.category === category;
+        return matchSearch && matchCategory;
+    });
+
+    renderTable(filtered);
+}
+
+function escapeHtml(str) {
+    if (typeof str !== 'string') str = String(str);
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+document.getElementById('search-input').addEventListener('input', filterTable);
+document.getElementById('category-filter').addEventListener('change', filterTable);
+
+renderTable(ciphers);
+</script>
+{% endblock %}
